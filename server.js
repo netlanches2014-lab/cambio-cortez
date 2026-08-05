@@ -5,17 +5,16 @@ const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-const NOVADAX_URL =
-  "https://api.novadax.com/v1/market/ticker?symbol=USDT_BRL";
-
-const BOLIVIA_URL =
+const BOB_URL =
   "https://api.dolarbluebolivia.click/v1/officialRate";
 
-const CACHE_TIME_MS = 60000;
-const REQUEST_TIMEOUT_MS = 12000;
+const BRL_URL =
+  "https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=brl";
 
-let cachedResult = null;
-let cachedAt = 0;
+const CACHE_TIME = 60000;
+
+let cache = null;
+let cacheTime = 0;
 
 app.disable("x-powered-by");
 
@@ -27,13 +26,13 @@ app.use(
         scriptSrc: ["'self'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
         imgSrc: ["'self'", "data:"],
-        connectSrc: ["'self'"]
-      }
-    }
+        connectSrc: ["'self'"],
+      },
+    },
   })
 );
 
-app.use(express.json({ limit: "20kb" }));
+app.use(express.json());
 app.use(express.static(__dirname));
 
 async function fetchJson(url) {
@@ -41,21 +40,19 @@ async function fetchJson(url) {
 
   const timeout = setTimeout(() => {
     controller.abort();
-  }, REQUEST_TIMEOUT_MS);
+  }, 12000);
 
   try {
     const response = await fetch(url, {
       headers: {
         accept: "application/json",
-        "user-agent": "CambioCortez/5.0"
+        "user-agent": "CambioCortez/3.0",
       },
-      signal: controller.signal
+      signal: controller.signal,
     });
 
     if (!response.ok) {
-      throw new Error(
-        `A fonte respondeu HTTP ${response.status}`
-      );
+      throw new Error(`Fonte respondeu HTTP ${response.status}`);
     }
 
     return await response.json();
@@ -64,67 +61,33 @@ async function fetchJson(url) {
   }
 }
 
-async function fetchNovadaxRate() {
-  const response = await fetchJson(NOVADAX_URL);
-
-  if (response?.code !== "A10000") {
-    throw new Error(
-      response?.message || "Erro na resposta da NovaDAX."
-    );
-  }
-
-  const ticker = response?.data;
-
-  const buy = Number(ticker?.bid);
-  const sell = Number(ticker?.ask);
-
-  if (
-    !Number.isFinite(buy) ||
-    !Number.isFinite(sell) ||
-    buy <= 0 ||
-    sell <= 0
-  ) {
-    throw new Error(
-      "A NovaDAX retornou valores inválidos."
-    );
-  }
-
-  return {
-    buy,
-    sell
-  };
-}
-
-async function fetchBoliviaRate() {
-  const response = await fetchJson(BOLIVIA_URL);
-
-  const blue = response?.data?.blue;
-
-  const buy = Number(blue?.buy);
-  const sell = Number(blue?.sell);
-
-  if (
-    !Number.isFinite(buy) ||
-    !Number.isFinite(sell) ||
-    buy <= 0 ||
-    sell <= 0
-  ) {
-    throw new Error(
-      "A fonte boliviana retornou valores inválidos."
-    );
-  }
-
-  return {
-    buy,
-    sell
-  };
-}
-
 async function buildQuotes() {
-  const [brl, bob] = await Promise.all([
-    fetchNovadaxRate(),
-    fetchBoliviaRate()
+  const [bobResponse, brlResponse] = await Promise.all([
+    fetchJson(BOB_URL),
+    fetchJson(BRL_URL),
   ]);
+
+  const bobBlue = bobResponse?.data?.blue;
+  const usdtBrl = Number(brlResponse?.tether?.brl);
+
+  const bobBuy = Number(bobBlue?.buy);
+  const bobSell = Number(bobBlue?.sell);
+
+  if (
+    !Number.isFinite(usdtBrl) ||
+    !Number.isFinite(bobBuy) ||
+    !Number.isFinite(bobSell) ||
+    usdtBrl <= 0 ||
+    bobBuy <= 0 ||
+    bobSell <= 0
+  ) {
+    throw new Error("Uma fonte retornou valores inválidos.");
+  }
+
+  const brlSpread = 0.003;
+
+  const brlBuy = usdtBrl * (1 - brlSpread);
+  const brlSell = usdtBrl * (1 + brlSpread);
 
   return {
     ok: true,
@@ -133,67 +96,58 @@ async function buildQuotes() {
     stale: false,
 
     source:
-      "USDT/BRL: NovaDAX • " +
-      "USDT/BOB: Powered by dolarbluebolivia.click",
+      "USDT/BRL: CoinGecko • USDT/BOB: Powered by dolarbluebolivia.click",
 
     methodology:
-      "USDT/BRL usa os melhores preços bid e ask da NovaDAX. " +
-      "USDT/BOB usa a cotação blue da Bolívia. " +
-      "BRL/BOB é calculado pelo cruzamento via USDT.",
+      "USDT/BRL com spread indicativo de 0,3%; USDT/BOB pela cotação blue; BRL/BOB cruzado via USDT",
 
     quotes: {
       BRL: {
         fiat: "BRL",
-        buy: brl.buy,
-        sell: brl.sell
+        buy: brlBuy,
+        sell: brlSell,
       },
 
       BOB: {
         fiat: "BOB",
-        buy: bob.buy,
-        sell: bob.sell
-      }
+        buy: bobBuy,
+        sell: bobSell,
+      },
     },
 
     cross: {
-      brlToBobBuy: bob.buy / brl.sell,
-      brlToBobSell: bob.sell / brl.buy
-    }
+      brlToBobBuy: bobBuy / brlSell,
+      brlToBobSell: bobSell / brlBuy,
+    },
   };
 }
 
 app.get("/api/quotes", async (_req, res) => {
   const now = Date.now();
 
-  if (
-    cachedResult &&
-    now - cachedAt < CACHE_TIME_MS
-  ) {
+  if (cache && now - cacheTime < CACHE_TIME) {
     return res.json({
-      ...cachedResult,
-      cached: true
+      ...cache,
+      cached: true,
     });
   }
 
   try {
     const result = await buildQuotes();
 
-    cachedResult = result;
-    cachedAt = now;
+    cache = result;
+    cacheTime = now;
 
     return res.json(result);
   } catch (error) {
-    console.error(
-      "Erro ao atualizar cotações:",
-      error
-    );
+    console.error("Erro nas cotações:", error);
 
-    if (cachedResult) {
+    if (cache) {
       return res.json({
-        ...cachedResult,
+        ...cache,
         cached: true,
         stale: true,
-        error: error.message
+        error: error.message,
       });
     }
 
@@ -202,7 +156,7 @@ app.get("/api/quotes", async (_req, res) => {
       error:
         error.name === "AbortError"
           ? "A consulta demorou mais que o esperado."
-          : error.message
+          : error.message,
     });
   }
 });
@@ -211,18 +165,14 @@ app.get("/api/health", (_req, res) => {
   res.json({
     ok: true,
     service: "Câmbio Cortez",
-    time: new Date().toISOString()
+    time: new Date().toISOString(),
   });
 });
 
 app.get("*", (_req, res) => {
-  res.sendFile(
-    path.join(__dirname, "index.html")
-  );
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(
-    `Câmbio Cortez iniciado na porta ${PORT}`
-  );
+  console.log(`Câmbio Cortez iniciado na porta ${PORT}`);
 });
