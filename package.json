@@ -1,15 +1,14 @@
 {
-  "name": "cambio-cortez-web",
-  "version": "1.0.0",
+  "name": "cambio-cortez",
+  "version": "2.0.0",
   "private": true,
-  "description": "Painel leve de cota\u00e7\u00e3o USDT/BRL e USDT/BOB baseado no mercado P2P.",
+  "description": "Cotações USDT/BRL e USDT/BOB via Binance P2P",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node --watch server.js"
+    "start": "node server.js"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "dependencies": {
     "express": "^4.21.2",
