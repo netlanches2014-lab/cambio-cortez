@@ -5,16 +5,16 @@ const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-const BINANCE_URL =
-  "https://api.binance.com/api/v3/ticker/bookTicker?symbol=USDTBRL";
-
-const BOLIVIA_URL =
+const BOB_URL =
   "https://api.dolarbluebolivia.click/v1/officialRate";
+
+const BRL_URL =
+  "https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=brl";
 
 const CACHE_TIME = 60000;
 
-let lastResult = null;
-let lastRequestTime = 0;
+let cache = null;
+let cacheTime = 0;
 
 app.disable("x-powered-by");
 
@@ -46,15 +46,13 @@ async function fetchJson(url) {
     const response = await fetch(url, {
       headers: {
         accept: "application/json",
-        "user-agent": "CambioCortez/2.1",
+        "user-agent": "CambioCortez/3.0",
       },
       signal: controller.signal,
     });
 
     if (!response.ok) {
-      throw new Error(
-        `A fonte respondeu HTTP ${response.status}`
-      );
+      throw new Error(`Fonte respondeu HTTP ${response.status}`);
     }
 
     return await response.json();
@@ -63,53 +61,45 @@ async function fetchJson(url) {
   }
 }
 
-async function getQuotes() {
-  const [binance, bolivia] = await Promise.all([
-    fetchJson(BINANCE_URL),
-    fetchJson(BOLIVIA_URL),
+async function buildQuotes() {
+  const [bobResponse, brlResponse] = await Promise.all([
+    fetchJson(BOB_URL),
+    fetchJson(BRL_URL),
   ]);
 
-  const brlBuy = Number(binance.bidPrice);
-  const brlSell = Number(binance.askPrice);
+  const bobBlue = bobResponse?.data?.blue;
+  const usdtBrl = Number(brlResponse?.tether?.brl);
 
-  const blue = bolivia?.data?.blue;
-
-  const bobBuy = Number(blue?.buy);
-  const bobSell = Number(blue?.sell);
-
-  const values = [
-    brlBuy,
-    brlSell,
-    bobBuy,
-    bobSell,
-  ];
+  const bobBuy = Number(bobBlue?.buy);
+  const bobSell = Number(bobBlue?.sell);
 
   if (
-    values.some(
-      (value) =>
-        !Number.isFinite(value) || value <= 0
-    )
+    !Number.isFinite(usdtBrl) ||
+    !Number.isFinite(bobBuy) ||
+    !Number.isFinite(bobSell) ||
+    usdtBrl <= 0 ||
+    bobBuy <= 0 ||
+    bobSell <= 0
   ) {
-    throw new Error(
-      "Uma das fontes retornou uma cotação inválida."
-    );
+    throw new Error("Uma fonte retornou valores inválidos.");
   }
+
+  const brlSpread = 0.003;
+
+  const brlBuy = usdtBrl * (1 - brlSpread);
+  const brlSell = usdtBrl * (1 + brlSpread);
 
   return {
     ok: true,
-
-    source:
-      "USDT/BRL: Binance Spot • " +
-      "USDT/BOB: Powered by dolarbluebolivia.click",
-
-    methodology:
-      "Compra e venda disponíveis nas fontes; " +
-      "BRL/BOB calculado pelo cruzamento via USDT",
-
     updatedAt: new Date().toISOString(),
-
     cached: false,
     stale: false,
+
+    source:
+      "USDT/BRL: CoinGecko • USDT/BOB: Powered by dolarbluebolivia.click",
+
+    methodology:
+      "USDT/BRL com spread indicativo de 0,3%; USDT/BOB pela cotação blue; BRL/BOB cruzado via USDT",
 
     quotes: {
       BRL: {
@@ -135,32 +125,26 @@ async function getQuotes() {
 app.get("/api/quotes", async (_req, res) => {
   const now = Date.now();
 
-  if (
-    lastResult &&
-    now - lastRequestTime < CACHE_TIME
-  ) {
+  if (cache && now - cacheTime < CACHE_TIME) {
     return res.json({
-      ...lastResult,
+      ...cache,
       cached: true,
     });
   }
 
   try {
-    const result = await getQuotes();
+    const result = await buildQuotes();
 
-    lastResult = result;
-    lastRequestTime = now;
+    cache = result;
+    cacheTime = now;
 
     return res.json(result);
   } catch (error) {
-    console.error(
-      "Erro ao atualizar cotações:",
-      error
-    );
+    console.error("Erro nas cotações:", error);
 
-    if (lastResult) {
+    if (cache) {
       return res.json({
-        ...lastResult,
+        ...cache,
         cached: true,
         stale: true,
         error: error.message,
@@ -186,13 +170,9 @@ app.get("/api/health", (_req, res) => {
 });
 
 app.get("*", (_req, res) => {
-  res.sendFile(
-    path.join(__dirname, "index.html")
-  );
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(
-    `Câmbio Cortez iniciado na porta ${PORT}`
-  );
+  console.log(`Câmbio Cortez iniciado na porta ${PORT}`);
 });
