@@ -1,15 +1,250 @@
-FROM node:20-alpine
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#080808">
+  <meta
+    name="description"
+    content="Câmbio Cortez — cotações USDT, Real e Boliviano."
+  >
 
-WORKDIR /app
+  <title>Câmbio Cortez</title>
 
-COPY package*.json ./
+  <link rel="stylesheet" href="/styles.css">
+</head>
 
-RUN npm install --omit=dev
+<body>
 
-COPY . .
+  <section id="accessScreen" class="access-screen">
+    <div class="access-card">
 
-ENV PORT=10000
+      <div class="spartan-logo">⚔️</div>
 
-EXPOSE 10000
+      <p class="eyebrow">COTAÇÕES P2P</p>
 
-CMD ["npm", "start"]
+      <h1>
+        CÂMBIO
+        <span>CORTEZ</span>
+      </h1>
+
+      <p class="intro">
+        USDT, Real e Boliviano em um painel simples,
+        rápido e preparado para celular.
+      </p>
+
+      <button id="accessButton" class="gold-button">
+        ACESSAR COTAÇÕES
+      </button>
+
+      <small>Não exige cadastro</small>
+
+    </div>
+  </section>
+
+  <main id="app" class="app hidden">
+
+    <header class="topbar">
+
+      <div class="brand">
+        <div class="mini-logo">⚔️</div>
+
+        <div>
+          <strong>Câmbio Cortez</strong>
+          <span>Mercado P2P</span>
+        </div>
+      </div>
+
+      <div id="status" class="status loading">
+        ● Conectando
+      </div>
+
+    </header>
+
+    <section class="hero">
+
+      <div>
+        <p class="eyebrow">PAINEL AO VIVO</p>
+        <h2>Cotações via USDT</h2>
+      </div>
+
+      <button
+        id="refreshButton"
+        class="refresh-button"
+        aria-label="Atualizar cotações"
+      >
+        ↻
+      </button>
+
+    </section>
+
+    <section class="cards">
+
+      <article class="quote-card">
+
+        <div class="card-title">
+          <span class="flag">🇧🇷</span>
+
+          <div>
+            <strong>USDT / BRL</strong>
+            <small>Brasil</small>
+          </div>
+        </div>
+
+        <div class="quote-grid">
+
+          <div>
+            <small>Você vende USDT</small>
+            <strong id="brlBuy">—</strong>
+          </div>
+
+          <div>
+            <small>Você compra USDT</small>
+            <strong id="brlSell">—</strong>
+          </div>
+
+        </div>
+
+      </article>
+
+      <article class="quote-card">
+
+        <div class="card-title">
+          <span class="flag">🇧🇴</span>
+
+          <div>
+            <strong>USDT / BOB</strong>
+            <small>Bolívia</small>
+          </div>
+        </div>
+
+        <div class="quote-grid">
+
+          <div>
+            <small>Você vende USDT</small>
+            <strong id="bobBuy">—</strong>
+          </div>
+
+          <div>
+            <small>Você compra USDT</small>
+            <strong id="bobSell">—</strong>
+          </div>
+
+        </div>
+
+      </article>
+
+      <article class="quote-card cross-card">
+
+        <div class="card-title">
+          <span class="flag">⇄</span>
+
+          <div>
+            <strong>BRL / BOB</strong>
+            <small>Cruzamento usando USDT</small>
+          </div>
+        </div>
+
+        <div class="quote-grid">
+
+          <div>
+            <small>Referência de compra</small>
+            <strong id="crossBuy">—</strong>
+          </div>
+
+          <div>
+            <small>Referência de venda</small>
+            <strong id="crossSell">—</strong>
+          </div>
+
+        </div>
+
+      </article>
+
+    </section>
+
+    <section class="converter">
+
+      <p class="eyebrow">CALCULADORA</p>
+      <h3>Conversor</h3>
+
+      <label for="amount">Valor</label>
+
+      <div class="input-row">
+
+        <input
+          id="amount"
+          type="number"
+          inputmode="decimal"
+          min="0"
+          step="0.01"
+          value="100"
+        >
+
+        <select id="fromCurrency">
+          <option value="USDT">USDT</option>
+          <option value="BRL">BRL</option>
+          <option value="BOB">BOB</option>
+        </select>
+
+      </div>
+
+      <button
+        id="swapButton"
+        class="swap-button"
+        aria-label="Inverter moedas"
+      >
+        ⇅
+      </button>
+
+      <label for="toCurrency">
+        Converter para
+      </label>
+
+      <select id="toCurrency" class="full-select">
+        <option value="BRL">BRL</option>
+        <option value="BOB">BOB</option>
+        <option value="USDT">USDT</option>
+      </select>
+
+      <div class="result-box">
+
+        <small>Resultado estimado</small>
+
+        <strong id="conversionResult">
+          —
+        </strong>
+
+        <span id="conversionRate">
+          Aguardando cotações
+        </span>
+
+      </div>
+
+    </section>
+
+    <div id="errorMessage" class="error-message hidden"></div>
+
+    <footer>
+
+      <div id="updatedAt">
+        Última atualização: —
+      </div>
+
+      <div id="methodology">
+        Fonte: Binance P2P
+      </div>
+
+      <p>
+        Referência informativa. Confirme preço,
+        limite e método de pagamento antes de negociar.
+      </p>
+
+    </footer>
+
+  </main>
+
+  <script src="/app.js"></script>
+
+</body>
+</html>
