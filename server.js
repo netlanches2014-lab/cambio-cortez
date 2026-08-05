@@ -5,16 +5,23 @@ const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-const BOB_URL =
+const BINANCE_ENDPOINTS = [
+  "https://api.binance.com/api/v3/ticker/bookTicker?symbol=USDTBRL",
+  "https://api-gcp.binance.com/api/v3/ticker/bookTicker?symbol=USDTBRL",
+  "https://api1.binance.com/api/v3/ticker/bookTicker?symbol=USDTBRL",
+  "https://api2.binance.com/api/v3/ticker/bookTicker?symbol=USDTBRL",
+  "https://api3.binance.com/api/v3/ticker/bookTicker?symbol=USDTBRL",
+  "https://api4.binance.com/api/v3/ticker/bookTicker?symbol=USDTBRL"
+];
+
+const BOLIVIA_URL =
   "https://api.dolarbluebolivia.click/v1/officialRate";
 
-const BRL_URL =
-  "https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=brl";
+const CACHE_TIME_MS = 60000;
+const REQUEST_TIMEOUT_MS = 12000;
 
-const CACHE_TIME = 60000;
-
-let cache = null;
-let cacheTime = 0;
+let cachedResult = null;
+let cachedAt = 0;
 
 app.disable("x-powered-by");
 
@@ -26,13 +33,13 @@ app.use(
         scriptSrc: ["'self'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
         imgSrc: ["'self'", "data:"],
-        connectSrc: ["'self'"],
-      },
-    },
+        connectSrc: ["'self'"]
+      }
+    }
   })
 );
 
-app.use(express.json());
+app.use(express.json({ limit: "20kb" }));
 app.use(express.static(__dirname));
 
 async function fetchJson(url) {
@@ -40,19 +47,21 @@ async function fetchJson(url) {
 
   const timeout = setTimeout(() => {
     controller.abort();
-  }, 12000);
+  }, REQUEST_TIMEOUT_MS);
 
   try {
     const response = await fetch(url, {
       headers: {
         accept: "application/json",
-        "user-agent": "CambioCortez/3.0",
+        "user-agent": "CambioCortez/4.0"
       },
-      signal: controller.signal,
+      signal: controller.signal
     });
 
     if (!response.ok) {
-      throw new Error(`Fonte respondeu HTTP ${response.status}`);
+      throw new Error(
+        `A fonte respondeu HTTP ${response.status}`
+      );
     }
 
     return await response.json();
@@ -61,33 +70,84 @@ async function fetchJson(url) {
   }
 }
 
-async function buildQuotes() {
-  const [bobResponse, brlResponse] = await Promise.all([
-    fetchJson(BOB_URL),
-    fetchJson(BRL_URL),
-  ]);
+async function fetchBinanceSpot() {
+  let lastError = null;
 
-  const bobBlue = bobResponse?.data?.blue;
-  const usdtBrl = Number(brlResponse?.tether?.brl);
+  for (const endpoint of BINANCE_ENDPOINTS) {
+    try {
+      const data = await fetchJson(endpoint);
 
-  const bobBuy = Number(bobBlue?.buy);
-  const bobSell = Number(bobBlue?.sell);
+      const bidPrice = Number(data?.bidPrice);
+      const askPrice = Number(data?.askPrice);
 
-  if (
-    !Number.isFinite(usdtBrl) ||
-    !Number.isFinite(bobBuy) ||
-    !Number.isFinite(bobSell) ||
-    usdtBrl <= 0 ||
-    bobBuy <= 0 ||
-    bobSell <= 0
-  ) {
-    throw new Error("Uma fonte retornou valores inválidos.");
+      if (
+        !Number.isFinite(bidPrice) ||
+        !Number.isFinite(askPrice) ||
+        bidPrice <= 0 ||
+        askPrice <= 0
+      ) {
+        throw new Error(
+          "A Binance retornou valores inválidos."
+        );
+      }
+
+      return {
+        bidPrice,
+        askPrice,
+        endpoint
+      };
+    } catch (error) {
+      lastError = error;
+      console.error(
+        `Falha no endpoint Binance ${endpoint}:`,
+        error.message
+      );
+    }
   }
 
-  const brlSpread = 0.003;
+  throw new Error(
+    `Todos os endpoints da Binance falharam. ${
+      lastError?.message || ""
+    }`
+  );
+}
 
-  const brlBuy = usdtBrl * (1 - brlSpread);
-  const brlSell = usdtBrl * (1 + brlSpread);
+async function fetchBoliviaRate() {
+  const response = await fetchJson(BOLIVIA_URL);
+
+  const blue = response?.data?.blue;
+
+  const buy = Number(blue?.buy);
+  const sell = Number(blue?.sell);
+
+  if (
+    !Number.isFinite(buy) ||
+    !Number.isFinite(sell) ||
+    buy <= 0 ||
+    sell <= 0
+  ) {
+    throw new Error(
+      "A fonte boliviana retornou valores inválidos."
+    );
+  }
+
+  return {
+    buy,
+    sell
+  };
+}
+
+async function buildQuotes() {
+  const [binance, bolivia] = await Promise.all([
+    fetchBinanceSpot(),
+    fetchBoliviaRate()
+  ]);
+
+  const brlBuy = binance.bidPrice;
+  const brlSell = binance.askPrice;
+
+  const bobBuy = bolivia.buy;
+  const bobSell = bolivia.sell;
 
   return {
     ok: true,
@@ -96,58 +156,68 @@ async function buildQuotes() {
     stale: false,
 
     source:
-      "USDT/BRL: CoinGecko • USDT/BOB: Powered by dolarbluebolivia.click",
+      "USDT/BRL: Binance Spot • " +
+      "USDT/BOB: Powered by dolarbluebolivia.click",
 
     methodology:
-      "USDT/BRL com spread indicativo de 0,3%; USDT/BOB pela cotação blue; BRL/BOB cruzado via USDT",
+      "USDT/BRL usa o melhor preço de compra e venda " +
+      "do livro Spot da Binance. " +
+      "USDT/BOB usa a cotação blue da Bolívia. " +
+      "BRL/BOB é calculado pelo cruzamento via USDT.",
 
     quotes: {
       BRL: {
         fiat: "BRL",
         buy: brlBuy,
-        sell: brlSell,
+        sell: brlSell
       },
 
       BOB: {
         fiat: "BOB",
         buy: bobBuy,
-        sell: bobSell,
-      },
+        sell: bobSell
+      }
     },
 
     cross: {
       brlToBobBuy: bobBuy / brlSell,
-      brlToBobSell: bobSell / brlBuy,
-    },
+      brlToBobSell: bobSell / brlBuy
+    }
   };
 }
 
 app.get("/api/quotes", async (_req, res) => {
   const now = Date.now();
 
-  if (cache && now - cacheTime < CACHE_TIME) {
+  if (
+    cachedResult &&
+    now - cachedAt < CACHE_TIME_MS
+  ) {
     return res.json({
-      ...cache,
-      cached: true,
+      ...cachedResult,
+      cached: true
     });
   }
 
   try {
     const result = await buildQuotes();
 
-    cache = result;
-    cacheTime = now;
+    cachedResult = result;
+    cachedAt = now;
 
     return res.json(result);
   } catch (error) {
-    console.error("Erro nas cotações:", error);
+    console.error(
+      "Erro ao atualizar cotações:",
+      error
+    );
 
-    if (cache) {
+    if (cachedResult) {
       return res.json({
-        ...cache,
+        ...cachedResult,
         cached: true,
         stale: true,
-        error: error.message,
+        error: error.message
       });
     }
 
@@ -156,7 +226,7 @@ app.get("/api/quotes", async (_req, res) => {
       error:
         error.name === "AbortError"
           ? "A consulta demorou mais que o esperado."
-          : error.message,
+          : error.message
     });
   }
 });
@@ -165,14 +235,18 @@ app.get("/api/health", (_req, res) => {
   res.json({
     ok: true,
     service: "Câmbio Cortez",
-    time: new Date().toISOString(),
+    time: new Date().toISOString()
   });
 });
 
 app.get("*", (_req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
+  res.sendFile(
+    path.join(__dirname, "index.html")
+  );
 });
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Câmbio Cortez iniciado na porta ${PORT}`);
+  console.log(
+    `Câmbio Cortez iniciado na porta ${PORT}`
+  );
 });
