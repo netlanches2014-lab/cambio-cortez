@@ -5,14 +5,8 @@ const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-const BINANCE_ENDPOINTS = [
-  "https://api.binance.com/api/v3/ticker/bookTicker?symbol=USDTBRL",
-  "https://api-gcp.binance.com/api/v3/ticker/bookTicker?symbol=USDTBRL",
-  "https://api1.binance.com/api/v3/ticker/bookTicker?symbol=USDTBRL",
-  "https://api2.binance.com/api/v3/ticker/bookTicker?symbol=USDTBRL",
-  "https://api3.binance.com/api/v3/ticker/bookTicker?symbol=USDTBRL",
-  "https://api4.binance.com/api/v3/ticker/bookTicker?symbol=USDTBRL"
-];
+const NOVADAX_URL =
+  "https://api.novadax.com/v1/market/ticker?symbol=USDT_BRL";
 
 const BOLIVIA_URL =
   "https://api.dolarbluebolivia.click/v1/officialRate";
@@ -53,7 +47,7 @@ async function fetchJson(url) {
     const response = await fetch(url, {
       headers: {
         accept: "application/json",
-        "user-agent": "CambioCortez/4.0"
+        "user-agent": "CambioCortez/5.0"
       },
       signal: controller.signal
     });
@@ -70,46 +64,35 @@ async function fetchJson(url) {
   }
 }
 
-async function fetchBinanceSpot() {
-  let lastError = null;
+async function fetchNovadaxRate() {
+  const response = await fetchJson(NOVADAX_URL);
 
-  for (const endpoint of BINANCE_ENDPOINTS) {
-    try {
-      const data = await fetchJson(endpoint);
-
-      const bidPrice = Number(data?.bidPrice);
-      const askPrice = Number(data?.askPrice);
-
-      if (
-        !Number.isFinite(bidPrice) ||
-        !Number.isFinite(askPrice) ||
-        bidPrice <= 0 ||
-        askPrice <= 0
-      ) {
-        throw new Error(
-          "A Binance retornou valores inválidos."
-        );
-      }
-
-      return {
-        bidPrice,
-        askPrice,
-        endpoint
-      };
-    } catch (error) {
-      lastError = error;
-      console.error(
-        `Falha no endpoint Binance ${endpoint}:`,
-        error.message
-      );
-    }
+  if (response?.code !== "A10000") {
+    throw new Error(
+      response?.message || "Erro na resposta da NovaDAX."
+    );
   }
 
-  throw new Error(
-    `Todos os endpoints da Binance falharam. ${
-      lastError?.message || ""
-    }`
-  );
+  const ticker = response?.data;
+
+  const buy = Number(ticker?.bid);
+  const sell = Number(ticker?.ask);
+
+  if (
+    !Number.isFinite(buy) ||
+    !Number.isFinite(sell) ||
+    buy <= 0 ||
+    sell <= 0
+  ) {
+    throw new Error(
+      "A NovaDAX retornou valores inválidos."
+    );
+  }
+
+  return {
+    buy,
+    sell
+  };
 }
 
 async function fetchBoliviaRate() {
@@ -138,16 +121,10 @@ async function fetchBoliviaRate() {
 }
 
 async function buildQuotes() {
-  const [binance, bolivia] = await Promise.all([
-    fetchBinanceSpot(),
+  const [brl, bob] = await Promise.all([
+    fetchNovadaxRate(),
     fetchBoliviaRate()
   ]);
-
-  const brlBuy = binance.bidPrice;
-  const brlSell = binance.askPrice;
-
-  const bobBuy = bolivia.buy;
-  const bobSell = bolivia.sell;
 
   return {
     ok: true,
@@ -156,32 +133,31 @@ async function buildQuotes() {
     stale: false,
 
     source:
-      "USDT/BRL: Binance Spot • " +
+      "USDT/BRL: NovaDAX • " +
       "USDT/BOB: Powered by dolarbluebolivia.click",
 
     methodology:
-      "USDT/BRL usa o melhor preço de compra e venda " +
-      "do livro Spot da Binance. " +
+      "USDT/BRL usa os melhores preços bid e ask da NovaDAX. " +
       "USDT/BOB usa a cotação blue da Bolívia. " +
       "BRL/BOB é calculado pelo cruzamento via USDT.",
 
     quotes: {
       BRL: {
         fiat: "BRL",
-        buy: brlBuy,
-        sell: brlSell
+        buy: brl.buy,
+        sell: brl.sell
       },
 
       BOB: {
         fiat: "BOB",
-        buy: bobBuy,
-        sell: bobSell
+        buy: bob.buy,
+        sell: bob.sell
       }
     },
 
     cross: {
-      brlToBobBuy: bobBuy / brlSell,
-      brlToBobSell: bobSell / brlBuy
+      brlToBobBuy: bob.buy / brl.sell,
+      brlToBobSell: bob.sell / brl.buy
     }
   };
 }
