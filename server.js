@@ -303,4 +303,144 @@ app.put(
   "/api/admin/quotes",
   requireAdmin,
   async (req, res) => {
-   
+    const brlBuy =
+      sanitizeNumber(
+        req.body?.brlBuy
+      );
+
+    const brlSell =
+      sanitizeNumber(
+        req.body?.brlSell
+      );
+
+    const bobBuy =
+      sanitizeNumber(
+        req.body?.bobBuy
+      );
+
+    const bobSell =
+      sanitizeNumber(
+        req.body?.bobSell
+      );
+
+    if (
+      ![
+        brlBuy,
+        brlSell,
+        bobBuy,
+        bobSell,
+      ].every(Boolean)
+    ) {
+      return res.status(400).json({
+        ok: false,
+        error:
+          "Preencha todos os campos com valores maiores que zero.",
+      });
+    }
+
+    try {
+      const rows =
+        await supabaseRequest(
+          "quotes?id=eq.main",
+          {
+            method: "PATCH",
+
+            body: JSON.stringify({
+              brl_buy: brlBuy,
+              brl_sell: brlSell,
+              bob_buy: bobBuy,
+              bob_sell: bobSell,
+
+              updated_at:
+                new Date().toISOString(),
+            }),
+          }
+        );
+
+      if (
+        !Array.isArray(rows) ||
+        !rows.length
+      ) {
+        throw new Error(
+          "Registro de cotação não encontrado."
+        );
+      }
+
+      return res.json({
+        ok: true,
+        data: rows[0],
+      });
+    } catch (error) {
+      console.error(
+        "Erro ao salvar:",
+        error
+      );
+
+      return res.status(500).json({
+        ok: false,
+        error:
+          "Não foi possível salvar.",
+      });
+    }
+  }
+);
+
+app.post(
+  "/api/admin/logout",
+  requireAdmin,
+  (req, res) => {
+    sessions.delete(
+      authToken(req)
+    );
+
+    return res.json({
+      ok: true,
+    });
+  }
+);
+
+app.get(
+  "/admin",
+  (_req, res) => {
+    res.sendFile(
+      path.join(
+        __dirname,
+        "admin.html"
+      )
+    );
+  }
+);
+
+app.get(
+  "/api/health",
+  (_req, res) => {
+    res.json({
+      ok: true,
+      service: "Câmbio Cortez",
+      time:
+        new Date().toISOString(),
+    });
+  }
+);
+
+app.get(
+  "*",
+  (_req, res) => {
+    res.sendFile(
+      path.join(
+        __dirname,
+        "index.html"
+      )
+    );
+  }
+);
+
+app.listen(
+  PORT,
+  "0.0.0.0",
+  () => {
+    console.log(
+      `Câmbio Cortez iniciado na porta ${PORT}`
+    );
+  }
+);
