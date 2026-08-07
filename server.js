@@ -1,20 +1,18 @@
 const express = require("express");
 const helmet = require("helmet");
 const path = require("path");
+const crypto = require("crypto");
 
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-const BOB_URL =
-  "https://api.dolarbluebolivia.click/v1/officialRate";
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+const WHATSAPP_NUMBER = process.env.WHATSAPP_NUMBER || "5567981740114";
 
-const BRL_URL =
-  "https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=brl";
-
-const CACHE_TIME = 60000;
-
-let cache = null;
-let cacheTime = 0;
+const sessions = new Map();
+const SESSION_TTL = 24 * 60 * 60 * 1000;
 
 app.disable("x-powered-by");
 
@@ -27,79 +25,152 @@ app.use(
         styleSrc: ["'self'", "'unsafe-inline'"],
         imgSrc: ["'self'", "data:"],
         connectSrc: ["'self'"],
+        formAction: ["'self'"],
       },
     },
   })
 );
 
-app.use(express.json());
+app.use(express.json({ limit: "20kb" }));
 app.use(express.static(__dirname));
 
-async function fetchJson(url) {
-  const controller = new AbortController();
+function requireEnv() {
+  const missing = [];
 
-  const timeout = setTimeout(() => {
-    controller.abort();
-  }, 12000);
+  if (!SUPABASE_URL) missing.push("SUPABASE_URL");
+  if (!SUPABASE_SERVICE_ROLE_KEY)
+    missing.push("SUPABASE_SERVICE_ROLE_KEY");
+  if (!ADMIN_PASSWORD) missing.push("ADMIN_PASSWORD");
 
-  try {
-    const response = await fetch(url, {
-      headers: {
-        accept: "application/json",
-        "user-agent": "CambioCortez/3.0",
-      },
-      signal: controller.signal,
-    });
-
-    if (!response.ok) {
-      throw new Error(`Fonte respondeu HTTP ${response.status}`);
-    }
-
-    return await response.json();
-  } finally {
-    clearTimeout(timeout);
+  if (missing.length) {
+    throw new Error(
+      `Variáveis ausentes: ${missing.join(", ")}`
+    );
   }
 }
 
-async function buildQuotes() {
-  const [bobResponse, brlResponse] = await Promise.all([
-    fetchJson(BOB_URL),
-    fetchJson(BRL_URL),
-  ]);
+function supabaseHeaders() {
+  return {
+    apikey: SUPABASE_SERVICE_ROLE_KEY,
+    Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+    "Content-Type": "application/json",
+  };
+}
 
-  const bobBlue = bobResponse?.data?.blue;
-  const usdtBrl = Number(brlResponse?.tether?.brl);
+async function supabaseRequest(endpoint, options = {}) {
+  requireEnv();
 
-  const bobBuy = Number(bobBlue?.buy);
-  const bobSell = Number(bobBlue?.sell);
+  const response = await fetch(
+    `${SUPABASE_URL}/rest/v1/${endpoint}`,
+    {
+      ...options,
+      headers: {
+        ...supabaseHeaders(),
+        Prefer: "return=representation",
+        ...(options.headers || {}),
+      },
+    }
+  );
 
-  if (
-    !Number.isFinite(usdtBrl) ||
-    !Number.isFinite(bobBuy) ||
-    !Number.isFinite(bobSell) ||
-    usdtBrl <= 0 ||
-    bobBuy <= 0 ||
-    bobSell <= 0
-  ) {
-    throw new Error("Uma fonte retornou valores inválidos.");
+  const text = await response.text();
+  const body = text ? JSON.parse(text) : null;
+
+  if (!response.ok) {
+    const message =
+      body?.message ||
+      body?.hint ||
+      `Supabase HTTP ${response.status}`;
+
+    throw new Error(message);
   }
 
-  const brlSpread = 0.003;
+  return body;
+}
 
-  const brlBuy = usdtBrl * (1 - brlSpread);
-  const brlSell = usdtBrl * (1 + brlSpread);
+function sanitizeNumber(value) {
+  const n = Number(value);
+
+  if (
+    !Number.isFinite(n) ||
+    n <= 0 ||
+    n > 1000000
+  ) {
+    return null;
+  }
+
+  return n;
+}
+
+function authToken(req) {
+  const header =
+    req.get("authorization") || "";
+
+  return header.startsWith("Bearer ")
+    ? header.slice(7)
+    : "";
+}
+
+function isAuthorized(req) {
+  const token = authToken(req);
+  const expires = sessions.get(token);
+
+  if (!expires) return false;
+
+  if (Date.now() > expires) {
+    sessions.delete(token);
+    return false;
+  }
+
+  return true;
+}
+
+function requireAdmin(req, res, next) {
+  if (!isAuthorized(req)) {
+    return res.status(401).json({
+      ok: false,
+      error: "Sessão inválida ou expirada.",
+    });
+  }
+
+  next();
+}
+
+async function getQuoteRow() {
+  const rows = await supabaseRequest(
+    "quotes?id=eq.main&select=id,brl_buy,brl_sell,bob_buy,bob_sell,updated_at",
+    { method: "GET" }
+  );
+
+  if (
+    !Array.isArray(rows) ||
+    !rows.length
+  ) {
+    throw new Error(
+      "Nenhuma cotação cadastrada."
+    );
+  }
+
+  return rows[0];
+}
+
+function publicPayload(row) {
+  const brlBuy = Number(row.brl_buy);
+  const brlSell = Number(row.brl_sell);
+  const bobBuy = Number(row.bob_buy);
+  const bobSell = Number(row.bob_sell);
 
   return {
     ok: true,
-    updatedAt: new Date().toISOString(),
-    cached: false,
-    stale: false,
+
+    updatedAt: row.updated_at,
 
     source:
-      "USDT/BRL: CoinGecko • USDT/BOB: Powered by dolarbluebolivia.click",
+      "Cotação manual • Câmbio Cortez",
 
     methodology:
-      "USDT/BRL com spread indicativo de 0,3%; USDT/BOB pela cotação blue; BRL/BOB cruzado via USDT",
+      "Valores definidos pelo administrador",
+
+    whatsapp: WHATSAPP_NUMBER,
 
     quotes: {
       BRL: {
@@ -116,63 +187,120 @@ async function buildQuotes() {
     },
 
     cross: {
-      brlToBobBuy: bobBuy / brlSell,
-      brlToBobSell: bobSell / brlBuy,
+      brlToBobBuy:
+        bobBuy / brlSell,
+
+      brlToBobSell:
+        bobSell / brlBuy,
     },
   };
 }
 
-app.get("/api/quotes", async (_req, res) => {
-  const now = Date.now();
+app.get(
+  "/api/quotes",
+  async (_req, res) => {
+    try {
+      const row =
+        await getQuoteRow();
 
-  if (cache && now - cacheTime < CACHE_TIME) {
-    return res.json({
-      ...cache,
-      cached: true,
-    });
+      res.set(
+        "Cache-Control",
+        "no-store"
+      );
+
+      return res.json(
+        publicPayload(row)
+      );
+    } catch (error) {
+      console.error(
+        "Erro ao carregar cotações:",
+        error
+      );
+
+      return res.status(500).json({
+        ok: false,
+        error:
+          "Não foi possível carregar as cotações.",
+      });
+    }
   }
+);
 
-  try {
-    const result = await buildQuotes();
+app.post(
+  "/api/admin/login",
+  (req, res) => {
+    try {
+      requireEnv();
 
-    cache = result;
-    cacheTime = now;
+      const password = String(
+        req.body?.password || ""
+      );
 
-    return res.json(result);
-  } catch (error) {
-    console.error("Erro nas cotações:", error);
+      const a =
+        Buffer.from(password);
 
-    if (cache) {
+      const b =
+        Buffer.from(ADMIN_PASSWORD);
+
+      if (
+        a.length !== b.length ||
+        !crypto.timingSafeEqual(a, b)
+      ) {
+        return res.status(401).json({
+          ok: false,
+          error: "Senha incorreta.",
+        });
+      }
+
+      const token =
+        crypto
+          .randomBytes(32)
+          .toString("hex");
+
+      sessions.set(
+        token,
+        Date.now() + SESSION_TTL
+      );
+
       return res.json({
-        ...cache,
-        cached: true,
-        stale: true,
+        ok: true,
+        token,
+      });
+    } catch (error) {
+      console.error(error);
+
+      return res.status(500).json({
+        ok: false,
+        error:
+          "Painel não configurado.",
+      });
+    }
+  }
+);
+
+app.get(
+  "/api/admin/quotes",
+  requireAdmin,
+  async (_req, res) => {
+    try {
+      const row =
+        await getQuoteRow();
+
+      return res.json({
+        ok: true,
+        data: row,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        ok: false,
         error: error.message,
       });
     }
-
-    return res.status(502).json({
-      ok: false,
-      error:
-        error.name === "AbortError"
-          ? "A consulta demorou mais que o esperado."
-          : error.message,
-    });
   }
-});
+);
 
-app.get("/api/health", (_req, res) => {
-  res.json({
-    ok: true,
-    service: "Câmbio Cortez",
-    time: new Date().toISOString(),
-  });
-});
-
-app.get("*", (_req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
-
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Câmbio Cortez iniciado na porta ${PORT}`);
-});
+app.put(
+  "/api/admin/quotes",
+  requireAdmin,
+  async (req, res) => {
+   
