@@ -9,13 +9,16 @@ async function login() {
   loginMsg.textContent = "Entrando...";
 
   try {
+    const password =
+      document.getElementById("password").value;
+
     const response = await fetch("/api/admin/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        password: document.getElementById("password").value,
+        password: password,
       }),
     });
 
@@ -36,7 +39,8 @@ async function login() {
 
     await loadQuotes();
   } catch (error) {
-    loginMsg.textContent = error.message;
+    loginMsg.textContent =
+      error.message || "Erro ao entrar.";
   }
 }
 
@@ -59,39 +63,28 @@ async function loadQuotes() {
       );
     }
 
-    const quote =
-      data.data ||
-      data.quote ||
-      data.quotes ||
-      data;
+    const quote = data.data || {};
 
-    document.getElementById(
-      "brlToBob"
-    ).value =
-      quote.brl_to_bob ??
-      quote.brlToBob ??
-      "";
+    document.getElementById("brlToBob").value =
+      quote.brl_to_bob ?? "";
 
-    document.getElementById(
-      "bobToBrl"
-    ).value =
-      quote.bob_to_brl ??
-      quote.bobToBrl ??
-      "";
+    document.getElementById("bobToBrl").value =
+      quote.bob_to_brl ?? "";
 
     loginBox.classList.add("hidden");
     adminBox.classList.remove("hidden");
 
+    loginMsg.textContent = "";
     adminMsg.textContent = "";
   } catch (error) {
     sessionStorage.removeItem("adminToken");
-
     token = "";
 
     loginBox.classList.remove("hidden");
     adminBox.classList.add("hidden");
 
-    loginMsg.textContent = error.message;
+    loginMsg.textContent =
+      error.message || "Erro ao carregar painel.";
   }
 }
 
@@ -107,21 +100,15 @@ async function saveQuotes() {
       document.getElementById("bobToBrl").value
     );
 
-    if (
-      !Number.isFinite(brlToBob) ||
-      brlToBob <= 0
-    ) {
+    if (!Number.isFinite(brlToBob) || brlToBob <= 0) {
       throw new Error(
-        "Informe uma cotação válida de REAL para BOLIVIANO."
+        "Digite um valor válido para REAL → BOLIVIANO."
       );
     }
 
-    if (
-      !Number.isFinite(bobToBrl) ||
-      bobToBrl <= 0
-    ) {
+    if (!Number.isFinite(bobToBrl) || bobToBrl <= 0) {
       throw new Error(
-        "Informe uma cotação válida de BOLIVIANO para REAL."
+        "Digite um valor válido para BOLIVIANO → REAL."
       );
     }
 
@@ -134,8 +121,8 @@ async function saveQuotes() {
           Authorization: "Bearer " + token,
         },
         body: JSON.stringify({
-          brlToBob,
-          bobToBrl,
+          brlToBob: brlToBob,
+          bobToBrl: bobToBrl,
         }),
       }
     );
@@ -144,35 +131,34 @@ async function saveQuotes() {
 
     if (!response.ok || !data.ok) {
       throw new Error(
-        data.error ||
-        "Não foi possível salvar as cotações."
+        data.error || "Não foi possível salvar."
       );
     }
 
     adminMsg.textContent =
+      "Cotações
+          adminMsg.textContent =
       "Cotações atualizadas com sucesso.";
   } catch (error) {
-    adminMsg.textContent = error.message;
+    adminMsg.textContent =
+      error.message || "Erro ao salvar.";
   }
 }
 
 async function logout() {
   try {
-    await fetch(
-      "/api/admin/logout",
-      {
-        method: "POST",
-        headers: {
-          Authorization: "Bearer " + token,
-        },
-      }
-    );
-  } catch {}
+    await fetch("/api/admin/logout", {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+  }
 
   sessionStorage.removeItem("adminToken");
-
   token = "";
-
   location.reload();
 }
 
@@ -185,3 +171,18 @@ document
   .addEventListener("click", saveQuotes);
 
 document
+  .getElementById("logoutBtn")
+  .addEventListener("click", logout);
+
+document
+  .getElementById("password")
+  .addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      login();
+    }
+  });
+
+if (token) {
+  loadQuotes();
+}
+      
