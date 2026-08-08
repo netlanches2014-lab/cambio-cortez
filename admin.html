@@ -14,52 +14,61 @@
     body {
       margin: 0;
       min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      font-family: Arial, Helvetica, sans-serif;
       background: #050505;
       color: #ffffff;
-      font-family: Arial, Helvetica, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       padding: 20px;
     }
 
     .card {
       width: 100%;
-      max-width: 650px;
+      max-width: 620px;
       background: #151515;
       border: 1px solid #6b5421;
       border-radius: 28px;
-      padding: 38px;
+      padding: 36px;
     }
 
     h1 {
-      margin-top: 0;
-      margin-bottom: 8px;
+      margin: 0 0 8px;
       color: #f5c451;
       font-size: 34px;
     }
 
     .subtitle {
       color: #aaaaaa;
-      margin-bottom: 35px;
+      margin-bottom: 30px;
       font-size: 18px;
+    }
+
+    .status {
+      color: #67d99a;
+      margin-bottom: 28px;
+      font-size: 18px;
+    }
+
+    .hidden {
+      display: none;
     }
 
     label {
       display: block;
       margin-bottom: 8px;
-      color: #dddddd;
+      color: #eeeeee;
       font-size: 18px;
-      font-weight: 600;
+      font-weight: bold;
     }
 
     input {
       width: 100%;
-      background: #080808;
-      color: #ffffff;
-      border: 1px solid #444444;
-      border-radius: 14px;
       padding: 16px;
+      border-radius: 14px;
+      border: 1px solid #444;
+      background: #080808;
+      color: #fff;
       font-size: 20px;
       outline: none;
     }
@@ -68,14 +77,30 @@
       border-color: #f5c451;
     }
 
+    .rate-box {
+      background: #0b0b0b;
+      border: 1px solid #222;
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .rate-box small {
+      display: block;
+      margin-top: 10px;
+      color: #9a9a9a;
+      line-height: 1.5;
+      font-size: 15px;
+    }
+
     button {
       width: 100%;
-      border: none;
+      border: 0;
       border-radius: 14px;
       padding: 16px;
-      margin-top: 18px;
+      margin-top: 16px;
       background: #f5c451;
-      color: #111111;
+      color: #111;
       font-size: 18px;
       font-weight: bold;
       cursor: pointer;
@@ -83,64 +108,17 @@
 
     button.secondary {
       background: #2a2a2a;
-      color: white;
-    }
-
-    .hidden {
-      display: none;
+      color: #fff;
     }
 
     .msg {
       margin-top: 16px;
-      min-height: 22px;
-      color: #f4c95d;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-    }
-
-    .status {
-      margin-bottom: 24px;
-      color: #67d99a;
-    }
-
-    .rate-box {
-      background: #0b0b0b;
-      border-radius: 18px;
-      padding: 18px;
-      border: 1px solid #202020;
-    }
-
-    .rate-box small {
-      display: block;
-      color: #929292;
-      margin-top: 9px;
-      line-height: 1.5;
-      font-size: 14px;
-    }
-
-    .section-title {
-      grid-column: 1 / -1;
+      min-height: 24px;
       color: #f5c451;
-      font-size: 15px;
-      font-weight: bold;
-      letter-spacing: 2px;
-      margin-top: 10px;
-      margin-bottom: -4px;
+      font-size: 16px;
     }
 
     @media (max-width: 600px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      .section-title {
-        grid-column: 1;
-      }
-
       .card {
         padding: 28px 22px;
       }
@@ -156,9 +134,7 @@
 
   <div class="card">
 
-    <!-- LOGIN -->
     <div id="loginBox">
-
       <h1>Câmbio Cortez</h1>
 
       <div class="subtitle">
@@ -181,11 +157,9 @@
       </button>
 
       <div id="loginMsg" class="msg"></div>
-
     </div>
 
 
-    <!-- PAINEL -->
     <div id="adminBox" class="hidden">
 
       <h1>Cotações</h1>
@@ -194,133 +168,41 @@
         ● Painel conectado
       </div>
 
-      <div class="grid">
+      <div class="rate-box">
+        <label for="brlToBob">
+          🇧🇷 REAL → BOLIVIANO 🇧🇴
+        </label>
 
-        <div class="section-title">
-          USDT / REAL
-        </div>
+        <input
+          id="brlToBob"
+          type="number"
+          step="0.01"
+          inputmode="decimal"
+          placeholder="Ex.: 2.20"
+        >
 
-        <div class="rate-box">
-
-          <label for="brlBuy">
-            USDT → BRL
-          </label>
-
-          <input
-            id="brlBuy"
-            type="number"
-            step="0.01"
-          >
-
-          <small>
-            Quantos reais você paga quando recebe 1 USDT.
-          </small>
-
-        </div>
+        <small>
+          Quantos bolivianos você paga por cada R$ 1 recebido.
+        </small>
+      </div>
 
 
-        <div class="rate-box">
+      <div class="rate-box">
+        <label for="bobToBrl">
+          🇧🇴 BOLIVIANO → REAL 🇧🇷
+        </label>
 
-          <label for="brlSell">
-            BRL → USDT
-          </label>
+        <input
+          id="bobToBrl"
+          type="number"
+          step="0.01"
+          inputmode="decimal"
+          placeholder="Ex.: 2.18"
+        >
 
-          <input
-            id="brlSell"
-            type="number"
-            step="0.01"
-          >
-
-          <small>
-            Quantos reais você recebe para entregar 1 USDT.
-          </small>
-
-        </div>
-
-
-        <div class="section-title">
-          USDT / BOLIVIANO
-        </div>
-
-        <div class="rate-box">
-
-          <label for="bobBuy">
-            BOB → USDT
-          </label>
-
-          <input
-            id="bobBuy"
-            type="number"
-            step="0.01"
-          >
-
-          <small>
-            Quantos bolivianos você recebe para entregar 1 USDT.
-          </small>
-
-        </div>
-
-
-        <div class="rate-box">
-
-          <label for="bobSell">
-            USDT → BOB
-          </label>
-
-          <input
-            id="bobSell"
-            type="number"
-            step="0.01"
-          >
-
-          <small>
-            Quantos bolivianos você paga quando recebe 1 USDT.
-          </small>
-
-        </div>
-
-
-        <div class="section-title">
-          REAL / BOLIVIANO
-        </div>
-
-        <div class="rate-box">
-
-          <label for="brlToBob">
-            BRL → BOB
-          </label>
-
-          <input
-            id="brlToBob"
-            type="number"
-            step="0.01"
-          >
-
-          <small>
-            Quantos bolivianos você paga por cada R$ 1 recebido.
-          </small>
-
-        </div>
-
-
-        <div class="rate-box">
-
-          <label for="bobToBrl">
-            BOB → BRL
-          </label>
-
-          <input
-            id="bobToBrl"
-            type="number"
-            step="0.01"
-          >
-
-          <small>
-            Quantos bolivianos você recebe para pagar R$ 1.
-          </small>
-
-        </div>
-
+        <small>
+          Quantos bolivianos você recebe para pagar R$ 1.
+        </small>
       </div>
 
 
@@ -329,19 +211,4 @@
       </button>
 
       <button
-        id="logoutBtn"
-        class="secondary"
-      >
-        Sair
-      </button>
-
-      <div id="adminMsg" class="msg"></div>
-
-    </div>
-
-  </div>
-
-  <script src="/admin.js"></script>
-
-</body>
-</html>
+        id="logout
