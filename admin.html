@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin • Câmbio Cortez</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Câmbio Cortez - Painel Administrativo</title>
 
   <style>
     * {
@@ -13,60 +14,68 @@
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: Arial, sans-serif;
-      background: #080808;
-      color: #f5f5f5;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
+      background: #050505;
+      color: #ffffff;
+      font-family: Arial, Helvetica, sans-serif;
       padding: 20px;
     }
 
     .card {
       width: 100%;
-      max-width: 520px;
+      max-width: 620px;
       background: #151515;
-      border: 1px solid #5f491a;
-      border-radius: 24px;
-      padding: 28px;
+      border: 1px solid #6b5421;
+      border-radius: 28px;
+      padding: 38px;
     }
 
     h1 {
-      margin: 0 0 8px;
-      color: #f4c95d;
+      margin-top: 0;
+      margin-bottom: 8px;
+      color: #f5c451;
+      font-size: 34px;
     }
 
     .subtitle {
-      color: #aaa;
-      margin-bottom: 28px;
+      color: #aaaaaa;
+      margin-bottom: 35px;
+      font-size: 18px;
     }
 
     label {
       display: block;
-      margin-top: 18px;
-      margin-bottom: 7px;
-      color: #ccc;
+      margin-bottom: 8px;
+      color: #dddddd;
+      font-size: 16px;
     }
 
     input {
       width: 100%;
-      padding: 15px;
-      border-radius: 12px;
-      border: 1px solid #444;
-      background: #090909;
-      color: white;
-      font-size: 17px;
+      background: #080808;
+      color: #ffffff;
+      border: 1px solid #444444;
+      border-radius: 14px;
+      padding: 16px;
+      font-size: 18px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #f5c451;
     }
 
     button {
       width: 100%;
-      margin-top: 20px;
-      padding: 15px;
-      border: 0;
-      border-radius: 12px;
-      background: #f4c95d;
-      color: #111;
-      font-size: 17px;
+      border: none;
+      border-radius: 14px;
+      padding: 16px;
+      margin-top: 18px;
+      background: #f5c451;
+      color: #111111;
+      font-size: 18px;
       font-weight: bold;
       cursor: pointer;
     }
@@ -96,17 +105,50 @@
       margin-bottom: 20px;
       color: #67d99a;
     }
+
+    .rate-box {
+      background: #0b0b0b;
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .rate-box small {
+      display: block;
+      color: #888888;
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: 28px 22px;
+      }
+
+      h1 {
+        font-size: 30px;
+      }
+    }
   </style>
 </head>
 
 <body>
+
   <div class="card">
 
+    <!-- LOGIN -->
     <div id="loginBox">
+
       <h1>Câmbio Cortez</h1>
       <div class="subtitle">Painel administrativo</div>
 
-      <label for="password">Senha do administrador</label>
+      <label for="password">
+        Senha do administrador
+      </label>
+
       <input
         id="password"
         type="password"
@@ -114,45 +156,126 @@
         placeholder="Digite sua senha"
       />
 
-      <button id="loginBtn">Entrar</button>
+      <button id="loginBtn">
+        Entrar
+      </button>
 
       <div id="loginMsg" class="msg"></div>
+
     </div>
 
+
+    <!-- PAINEL DE COTAÇÕES -->
     <div id="adminBox" class="hidden">
+
       <h1>Cotações</h1>
-      <div class="status">● Painel conectado</div>
 
-      <div class="grid">
-        <div>
-          <label for="brlBuy">BRL compra</label>
-          <input id="brlBuy" type="number" step="0.01" />
-        </div>
-
-        <div>
-          <label for="brlSell">BRL venda</label>
-          <input id="brlSell" type="number" step="0.01" />
-        </div>
-
-        <div>
-          <label for="bobBuy">BOB compra</label>
-          <input id="bobBuy" type="number" step="0.01" />
-        </div>
-
-        <div>
-          <label for="bobSell">BOB venda</label>
-          <input id="bobSell" type="number" step="0.01" />
-        </div>
+      <div class="status">
+        ● Painel conectado
       </div>
 
-      <button id="saveBtn">Salvar cotações</button>
-      <button id="logoutBtn" class="secondary">Sair</button>
+      <div class="grid">
+
+        <!-- USDT PARA REAL -->
+        <div class="rate-box">
+
+          <label for="brlBuy">
+            USDT → BRL
+          </label>
+
+          <input
+            id="brlBuy"
+            type="number"
+            step="0.01"
+          />
+
+          <small>
+            Quantos reais você paga por 1 USDT recebido.
+          </small>
+
+        </div>
+
+
+        <!-- REAL PARA USDT -->
+        <div class="rate-box">
+
+          <label for="brlSell">
+            BRL → USDT
+          </label>
+
+          <input
+            id="brlSell"
+            type="number"
+            step="0.01"
+          />
+
+          <small>
+            Quantos reais você recebe para entregar 1 USDT.
+          </small>
+
+        </div>
+
+
+        <!-- BOLIVIANO PARA USDT -->
+        <div class="rate-box">
+
+          <label for="bobBuy">
+            BOB → USDT
+          </label>
+
+          <input
+            id="bobBuy"
+            type="number"
+            step="0.01"
+          />
+
+          <small>
+            Quantos bolivianos você recebe para entregar 1 USDT.
+          </small>
+
+        </div>
+
+
+        <!-- USDT PARA BOLIVIANO -->
+        <div class="rate-box">
+
+          <label for="bobSell">
+            USDT → BOB
+          </label>
+
+          <input
+            id="bobSell"
+            type="number"
+            step="0.01"
+          />
+
+          <small>
+            Quantos bolivianos você paga por 1 USDT recebido.
+          </small>
+
+        </div>
+
+      </div>
+
+
+      <button id="saveBtn">
+        Salvar cotações
+      </button>
+
+      <button
+        id="logoutBtn"
+        class="secondary"
+      >
+        Sair
+      </button>
 
       <div id="adminMsg" class="msg"></div>
+
     </div>
 
   </div>
 
   <script src="/admin.js"></script>
+
 </body>
 </html>
