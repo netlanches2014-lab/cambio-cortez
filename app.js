@@ -71,6 +71,7 @@ async function loadQuotes() {
 
     if (data.stale) {
       setStatus("error", "Última cotação");
+
       showError(
         "A fonte está temporariamente indisponível. " +
           "O painel está mostrando a última cotação salva."
@@ -120,17 +121,35 @@ function renderQuotes() {
     "BOB"
   );
 
+  /*
+    CRUZAMENTO BRL / BOB
+
+    BRL -> BOB:
+    BRL compra USDT pela taxa BRL sell.
+    Depois USDT é vendido por BOB pela taxa BOB sell.
+
+    BOB -> BRL:
+    BOB compra USDT pela taxa BOB buy.
+    Depois USDT é vendido por BRL pela taxa BRL buy.
+  */
+
+  const crossBrlToBob =
+    Number(bob.sell) / Number(brl.sell);
+
+  const crossBobToBrl =
+    Number(brl.buy) / Number(bob.buy);
+
   $("crossBuy").textContent =
-    data.cross.brlToBobBuy.toLocaleString("pt-BR", {
+    crossBrlToBob.toLocaleString("pt-BR", {
       minimumFractionDigits: 4,
       maximumFractionDigits: 4,
     }) + " BOB";
 
   $("crossSell").textContent =
-    data.cross.brlToBobSell.toLocaleString("pt-BR", {
+    crossBobToBrl.toLocaleString("pt-BR", {
       minimumFractionDigits: 4,
       maximumFractionDigits: 4,
-    }) + " BOB";
+    }) + " BRL";
 
   const updatedDate = new Date(data.updatedAt);
 
@@ -144,21 +163,95 @@ function renderQuotes() {
   convert();
 }
 
-function currencyToUSDT(currency) {
-  if (currency === "USDT") {
-    return 1;
-  }
-
-  const quote = state.data?.quotes?.[currency];
-
-  if (!quote) {
+function convertCurrency(amount, fromCurrency, toCurrency) {
+  if (!state.data?.quotes) {
     return null;
   }
 
-  const averagePrice =
-    (Number(quote.buy) + Number(quote.sell)) / 2;
+  if (fromCurrency === toCurrency) {
+    return amount;
+  }
 
-  return 1 / averagePrice;
+  const brl = state.data.quotes.BRL;
+  const bob = state.data.quotes.BOB;
+
+  /*
+    REGRAS DA OPERAÇÃO
+
+    USDT -> BRL
+    1 USDT = BRL buy
+
+    BRL -> USDT
+    BRL sell = 1 USDT
+
+    USDT -> BOB
+    1 USDT = BOB sell
+
+    BOB -> USDT
+    BOB buy = 1 USDT
+  */
+
+  if (
+    fromCurrency === "USDT" &&
+    toCurrency === "BRL"
+  ) {
+    return amount * Number(brl.buy);
+  }
+
+  if (
+    fromCurrency === "BRL" &&
+    toCurrency === "USDT"
+  ) {
+    return amount / Number(brl.sell);
+  }
+
+  if (
+    fromCurrency === "USDT" &&
+    toCurrency === "BOB"
+  ) {
+    return amount * Number(bob.sell);
+  }
+
+  if (
+    fromCurrency === "BOB" &&
+    toCurrency === "USDT"
+  ) {
+    return amount / Number(bob.buy);
+  }
+
+  /*
+    BRL -> BOB
+    Primeiro BRL -> USDT.
+    Depois USDT -> BOB.
+  */
+
+  if (
+    fromCurrency === "BRL" &&
+    toCurrency === "BOB"
+  ) {
+    const usdt =
+      amount / Number(brl.sell);
+
+    return usdt * Number(bob.sell);
+  }
+
+  /*
+    BOB -> BRL
+    Primeiro BOB -> USDT.
+    Depois USDT -> BRL.
+  */
+
+  if (
+    fromCurrency === "BOB" &&
+    toCurrency === "BRL"
+  ) {
+    const usdt =
+      amount / Number(bob.buy);
+
+    return usdt * Number(brl.buy);
+  }
+
+  return null;
 }
 
 function convert() {
@@ -166,29 +259,46 @@ function convert() {
     return;
   }
 
-  const amount = Number($("amount").value || 0);
-  const fromCurrency = $("fromCurrency").value;
-  const toCurrency = $("toCurrency").value;
+  const amount =
+    Number($("amount").value || 0);
 
-  const fromRate = currencyToUSDT(fromCurrency);
-  const toRate = currencyToUSDT(toCurrency);
+  const fromCurrency =
+    $("fromCurrency").value;
 
-  if (!fromRate || !toRate) {
+  const toCurrency =
+    $("toCurrency").value;
+
+  const convertedValue =
+    convertCurrency(
+      amount,
+      fromCurrency,
+      toCurrency
+    );
+
+  if (!Number.isFinite(convertedValue)) {
     $("conversionResult").textContent = "—";
+    $("conversionRate").textContent = "—";
     return;
   }
 
-  const convertedValue =
-    (amount * fromRate) / toRate;
-
   $("conversionResult").textContent =
-    formatCurrency(convertedValue, toCurrency);
+    formatCurrency(
+      convertedValue,
+      toCurrency
+    );
 
-  const unitValue = fromRate / toRate;
+  const unitValue =
+    convertCurrency(
+      1,
+      fromCurrency,
+      toCurrency
+    );
 
   $("conversionRate").textContent =
-    `1 ${fromCurrency} ≈ ` +
-    formatCurrency(unitValue, toCurrency);
+    `1 ${fromCurrency} = ${formatCurrency(
+      unitValue,
+      toCurrency
+    )}`;
 }
 
 function swapCurrencies() {
