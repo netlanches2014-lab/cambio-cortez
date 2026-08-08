@@ -7,7 +7,7 @@
 
   <meta
     name="description"
-    content="Câmbio Cortez — cotações USDT, Real e Boliviano."
+    content="Câmbio Cortez — cotação direta entre Real e Boliviano."
   >
 
   <title>Câmbio Cortez</title>
@@ -23,7 +23,7 @@
 
       <div class="spartan-logo">⚔️</div>
 
-      <p class="eyebrow">COTAÇÕES P2P</p>
+      <p class="eyebrow">COTAÇÃO DIRETA</p>
 
       <h1>
         CÂMBIO
@@ -31,7 +31,7 @@
       </h1>
 
       <p class="intro">
-        USDT, Real e Boliviano em um painel simples,
+        Real e Boliviano em um painel simples,
         rápido e preparado para celular.
       </p>
 
@@ -72,7 +72,7 @@
 
       <div>
         <p class="eyebrow">PAINEL AO VIVO</p>
-        <h2>Cotações</h2>
+        <h2>Cotações ao vivo</h2>
       </div>
 
       <button
@@ -88,73 +88,6 @@
 
     <section class="cards">
 
-
-      <!-- USDT / BRL -->
-
-      <article class="quote-card">
-
-        <div class="card-title">
-
-          <span class="flag">🇧🇷</span>
-
-          <div>
-            <strong>USDT / BRL</strong>
-            <small>Brasil</small>
-          </div>
-
-        </div>
-
-        <div class="quote-grid">
-
-          <div>
-            <small>Você vende USDT</small>
-            <strong id="brlBuy">—</strong>
-          </div>
-
-          <div>
-            <small>Você compra USDT</small>
-            <strong id="brlSell">—</strong>
-          </div>
-
-        </div>
-
-      </article>
-
-
-      <!-- USDT / BOB -->
-
-      <article class="quote-card">
-
-        <div class="card-title">
-
-          <span class="flag">🇧🇴</span>
-
-          <div>
-            <strong>USDT / BOB</strong>
-            <small>Bolívia</small>
-          </div>
-
-        </div>
-
-        <div class="quote-grid">
-
-          <div>
-            <small>Você vende USDT</small>
-            <strong id="bobBuy">—</strong>
-          </div>
-
-          <div>
-            <small>Você compra USDT</small>
-            <strong id="bobSell">—</strong>
-          </div>
-
-        </div>
-
-      </article>
-
-
-      <!-- BRL / BOB -->
-
       <article class="quote-card cross-card">
 
         <div class="card-title">
@@ -162,8 +95,8 @@
           <span class="flag">🇧🇷 ⇄ 🇧🇴</span>
 
           <div>
-            <strong>BRL / BOB</strong>
-            <small>Cotação direta</small>
+            <strong>REAL ↔ BOLIVIANO</strong>
+            <small>Cotação direta definida por você</small>
           </div>
 
         </div>
@@ -171,7 +104,6 @@
         <div class="quote-grid">
 
           <div>
-
             <small>
               🇧🇷 Você vende REAL
               <br>
@@ -179,12 +111,10 @@
             </small>
 
             <strong id="crossBuy">—</strong>
-
           </div>
 
 
           <div>
-
             <small>
               🇧🇴 Você vende BOLIVIANO
               <br>
@@ -192,7 +122,6 @@
             </small>
 
             <strong id="crossSell">—</strong>
-
           </div>
 
         </div>
@@ -201,8 +130,6 @@
 
     </section>
 
-
-    <!-- CALCULADORA -->
 
     <section class="converter">
 
@@ -226,7 +153,6 @@
         >
 
         <select id="fromCurrency">
-          <option value="USDT">USDT</option>
           <option value="BRL">BRL</option>
           <option value="BOB">BOB</option>
         </select>
@@ -251,11 +177,8 @@
         id="toCurrency"
         class="full-select"
       >
-
-        <option value="BRL">BRL</option>
         <option value="BOB">BOB</option>
-        <option value="USDT">USDT</option>
-
+        <option value="BRL">BRL</option>
       </select>
 
 
@@ -270,7 +193,7 @@
         </strong>
 
         <span id="conversionRate">
-          Aguardando cotações
+          Aguardando cotação
         </span>
 
       </div>
