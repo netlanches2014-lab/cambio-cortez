@@ -9,58 +9,45 @@ async function login() {
   loginMsg.textContent = "Entrando...";
 
   try {
-    const password =
-      document.getElementById("password").value;
+    const password = document.getElementById("password").value;
 
     const response = await fetch("/api/admin/login", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        password: password,
-      }),
+        password
+      })
     });
 
     const data = await response.json();
 
     if (!response.ok || !data.ok) {
-      throw new Error(
-        data.error || "Não foi possível entrar."
-      );
+      throw new Error(data.error || "Não foi possível entrar.");
     }
 
     token = data.token;
-
-    sessionStorage.setItem(
-      "adminToken",
-      token
-    );
+    sessionStorage.setItem("adminToken", token);
 
     await loadQuotes();
   } catch (error) {
-    loginMsg.textContent =
-      error.message || "Erro ao entrar.";
+    loginMsg.textContent = error.message || "Erro ao entrar.";
   }
 }
 
 async function loadQuotes() {
   try {
-    const response = await fetch(
-      "/api/admin/quotes",
-      {
-        headers: {
-          Authorization: "Bearer " + token,
-        },
+    const response = await fetch("/api/admin/quotes", {
+      headers: {
+        Authorization: "Bearer " + token
       }
-    );
+    });
 
     const data = await response.json();
 
     if (!response.ok || !data.ok) {
-      throw new Error(
-        data.error || "Sessão inválida."
-      );
+      throw new Error(data.error || "Sessão inválida.");
     }
 
     const quote = data.data || {};
@@ -112,32 +99,25 @@ async function saveQuotes() {
       );
     }
 
-    const response = await fetch(
-      "/api/admin/quotes",
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + token,
-        },
-        body: JSON.stringify({
-          brlToBob: brlToBob,
-          bobToBrl: bobToBrl,
-        }),
-      }
-    );
+    const response = await fetch("/api/admin/quotes", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token
+      },
+      body: JSON.stringify({
+        brlToBob,
+        bobToBrl
+      })
+    });
 
     const data = await response.json();
 
     if (!response.ok || !data.ok) {
-      throw new Error(
-        data.error || "Não foi possível salvar."
-      );
+      throw new Error(data.error || "Não foi possível salvar.");
     }
 
     adminMsg.textContent =
-      "Cotações
-          adminMsg.textContent =
       "Cotações atualizadas com sucesso.";
   } catch (error) {
     adminMsg.textContent =
@@ -150,8 +130,8 @@ async function logout() {
     await fetch("/api/admin/logout", {
       method: "POST",
       headers: {
-        Authorization: "Bearer " + token,
-      },
+        Authorization: "Bearer " + token
+      }
     });
   } catch (error) {
     console.error(error);
@@ -185,4 +165,3 @@ document
 if (token) {
   loadQuotes();
 }
-      
