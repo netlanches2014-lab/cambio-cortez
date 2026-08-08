@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#080808">
+
   <meta
     name="description"
     content="Câmbio Cortez — cotações USDT, Real e Boliviano."
@@ -17,6 +18,7 @@
 <body>
 
   <section id="accessScreen" class="access-screen">
+
     <div class="access-card">
 
       <div class="spartan-logo">⚔️</div>
@@ -40,19 +42,23 @@
       <small>Não exige cadastro</small>
 
     </div>
+
   </section>
+
 
   <main id="app" class="app hidden">
 
     <header class="topbar">
 
       <div class="brand">
+
         <div class="mini-logo">⚔️</div>
 
         <div>
           <strong>Câmbio Cortez</strong>
           <span>Mercado P2P</span>
         </div>
+
       </div>
 
       <div id="status" class="status loading">
@@ -61,11 +67,12 @@
 
     </header>
 
+
     <section class="hero">
 
       <div>
         <p class="eyebrow">PAINEL AO VIVO</p>
-        <h2>Cotações via USDT</h2>
+        <h2>Cotações</h2>
       </div>
 
       <button
@@ -78,17 +85,23 @@
 
     </section>
 
+
     <section class="cards">
+
+
+      <!-- USDT / BRL -->
 
       <article class="quote-card">
 
         <div class="card-title">
+
           <span class="flag">🇧🇷</span>
 
           <div>
             <strong>USDT / BRL</strong>
             <small>Brasil</small>
           </div>
+
         </div>
 
         <div class="quote-grid">
@@ -107,15 +120,20 @@
 
       </article>
 
+
+      <!-- USDT / BOB -->
+
       <article class="quote-card">
 
         <div class="card-title">
+
           <span class="flag">🇧🇴</span>
 
           <div>
             <strong>USDT / BOB</strong>
             <small>Bolívia</small>
           </div>
+
         </div>
 
         <div class="quote-grid">
@@ -134,27 +152,47 @@
 
       </article>
 
+
+      <!-- BRL / BOB -->
+
       <article class="quote-card cross-card">
 
         <div class="card-title">
-          <span class="flag">⇄</span>
+
+          <span class="flag">🇧🇷 ⇄ 🇧🇴</span>
 
           <div>
             <strong>BRL / BOB</strong>
-            <small>Cruzamento usando USDT</small>
+            <small>Cotação direta</small>
           </div>
+
         </div>
 
         <div class="quote-grid">
 
           <div>
-            <small>Referência de compra</small>
+
+            <small>
+              🇧🇷 Você vende REAL
+              <br>
+              → recebe BOLIVIANO 🇧🇴
+            </small>
+
             <strong id="crossBuy">—</strong>
+
           </div>
 
+
           <div>
-            <small>Referência de venda</small>
+
+            <small>
+              🇧🇴 Você vende BOLIVIANO
+              <br>
+              → recebe REAL 🇧🇷
+            </small>
+
             <strong id="crossSell">—</strong>
+
           </div>
 
         </div>
@@ -163,12 +201,18 @@
 
     </section>
 
+
+    <!-- CALCULADORA -->
+
     <section class="converter">
 
       <p class="eyebrow">CALCULADORA</p>
+
       <h3>Conversor</h3>
 
-      <label for="amount">Valor</label>
+      <label for="amount">
+        Valor
+      </label>
 
       <div class="input-row">
 
@@ -189,6 +233,7 @@
 
       </div>
 
+
       <button
         id="swapButton"
         class="swap-button"
@@ -197,19 +242,28 @@
         ⇅
       </button>
 
+
       <label for="toCurrency">
         Converter para
       </label>
 
-      <select id="toCurrency" class="full-select">
+      <select
+        id="toCurrency"
+        class="full-select"
+      >
+
         <option value="BRL">BRL</option>
         <option value="BOB">BOB</option>
         <option value="USDT">USDT</option>
+
       </select>
+
 
       <div class="result-box">
 
-        <small>Resultado estimado</small>
+        <small>
+          Resultado estimado
+        </small>
 
         <strong id="conversionResult">
           —
@@ -223,7 +277,12 @@
 
     </section>
 
-    <div id="errorMessage" class="error-message hidden"></div>
+
+    <div
+      id="errorMessage"
+      class="error-message hidden"
+    ></div>
+
 
     <footer>
 
@@ -232,17 +291,19 @@
       </div>
 
       <div id="methodology">
-        Fonte: Binance P2P
+        Cotação manual • Câmbio Cortez
       </div>
 
       <p>
-        Referência informativa. Confirme preço,
-        limite e método de pagamento antes de negociar.
+        Referência informativa.
+        Confirme preço, limite e método
+        de pagamento antes de negociar.
       </p>
 
     </footer>
 
   </main>
+
 
   <script src="/app.js"></script>
 
