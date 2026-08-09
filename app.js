@@ -168,7 +168,7 @@ function convertCurrency(
   fromCurrency,
   toCurrency
 ) {
-  const rates =
+  
       const rates = getRates();
 
   if (!rates) {
