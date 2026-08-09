@@ -169,3 +169,102 @@ function convertCurrency(
   toCurrency
 ) {
   const rates =
+      const rates = getRates();
+
+  if (!rates) {
+    return null;
+  }
+
+  const value = Number(amount);
+
+  if (!Number.isFinite(value)) {
+    return null;
+  }
+
+  if (fromCurrency === toCurrency) {
+    return {
+      value,
+      rateText: `1 ${fromCurrency} = 1 ${toCurrency}`,
+    };
+  }
+
+  if (fromCurrency === "BRL" && toCurrency === "BOB") {
+    return {
+      value: value * rates.brlToBob,
+      rateText: `1 BRL = ${rates.brlToBob.toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 4,
+      })} BOB`,
+    };
+  }
+
+  if (fromCurrency === "BOB" && toCurrency === "BRL") {
+    return {
+      value: value / rates.bobToBrl,
+      rateText: `${rates.bobToBrl.toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 4,
+      })} BOB = 1 BRL`,
+    };
+  }
+
+  return null;
+}
+
+function convert() {
+  const amount = Number($("amount").value);
+  const fromCurrency = $("fromCurrency").value;
+  const toCurrency = $("toCurrency").value;
+
+  const result = convertCurrency(
+    amount,
+    fromCurrency,
+    toCurrency
+  );
+
+  if (!result) {
+    $("conversionResult").textContent = "—";
+    $("conversionRate").textContent = "Aguardando cotação";
+    return;
+  }
+
+  $("conversionResult").textContent =
+    formatCurrency(result.value, toCurrency);
+
+  $("conversionRate").textContent = result.rateText;
+}
+
+$("amount").addEventListener("input", convert);
+
+$("fromCurrency").addEventListener("change", () => {
+  if ($("fromCurrency").value === "BRL") {
+    $("toCurrency").value = "BOB";
+  } else {
+    $("toCurrency").value = "BRL";
+  }
+
+  convert();
+});
+
+$("toCurrency").addEventListener("change", convert);
+
+$("swapButton").addEventListener("click", () => {
+  const from = $("fromCurrency").value;
+  const to = $("toCurrency").value;
+
+  $("fromCurrency").value = to;
+  $("toCurrency").value = from;
+
+  convert();
+});
+
+$("refreshButton").addEventListener("click", loadQuotes);
+
+$("accessButton").addEventListener("click", () => {
+  $("accessScreen").classList.add("hidden");
+  $("app").classList.remove("hidden");
+
+  loadQuotes();
+});
+
+loadQuotes();
