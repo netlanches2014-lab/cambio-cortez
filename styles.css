@@ -433,3 +433,28 @@ footer p {
   transform: scale(0.98);
   background: rgba(217, 173, 67, 0.12);
 }
+.copy-button {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 15px 20px;
+
+  background: #111111;
+  color: #f2c14e;
+
+  border: 1px solid #8f7028;
+  border-radius: 18px;
+
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+
+  text-align: center;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.copy-button:active {
+  background: #1b1b1b;
+  transform: scale(0.98);
+}
