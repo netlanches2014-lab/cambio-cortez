@@ -52,11 +52,17 @@ async function loadQuotes() {
 
     const quote = data.data || {};
 
-    document.getElementById("brlToBob").value =
-      quote.brl_to_bob ?? "";
+document.getElementById("clienteBrlToBob").value =
+  quote.cliente_brl_to_bob ?? "";
 
-    document.getElementById("bobToBrl").value =
-      quote.bob_to_brl ?? "";
+document.getElementById("clienteBobToBrl").value =
+  quote.cliente_bob_to_brl ?? "";
+
+document.getElementById("cambistaBrlToBob").value =
+  quote.cambista_brl_to_bob ?? "";
+
+document.getElementById("cambistaBobToBrl").value =
+  quote.cambista_bob_to_brl ?? "";
 
     loginBox.classList.add("hidden");
     adminBox.classList.remove("hidden");
