@@ -4,30 +4,44 @@ const path = require("path");
 const crypto = require("crypto");
 
 const app = express();
+
 const PORT = process.env.PORT || 10000;
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY =
   process.env.SUPABASE_SERVICE_ROLE_KEY;
+
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 const sessions = new Map();
 const SESSION_TTL = 24 * 60 * 60 * 1000;
 
+
+// ======================================
+// CONFIGURAÇÃO
+// ======================================
+
 app.disable("x-powered-by");
 
 app.use(
   helmet({
-    contentSecurityPolicy: false,
+    contentSecurityPolicy: false
   })
 );
 
 app.use(express.json({ limit: "20kb" }));
 app.use(express.static(__dirname));
 
+
+// ======================================
+// VERIFICAR VARIÁVEIS
+// ======================================
+
 function checkEnv() {
   if (!SUPABASE_URL) {
-    throw new Error("SUPABASE_URL não configurada.");
+    throw new Error(
+      "SUPABASE_URL não configurada."
+    );
   }
 
   if (!SUPABASE_SERVICE_ROLE_KEY) {
@@ -37,31 +51,47 @@ function checkEnv() {
   }
 
   if (!ADMIN_PASSWORD) {
-    throw new Error("ADMIN_PASSWORD não configurada.");
+    throw new Error(
+      "ADMIN_PASSWORD não configurada."
+    );
   }
 }
+
+
+// ======================================
+// HEADERS SUPABASE
+// ======================================
 
 function supabaseHeaders() {
   return {
     apikey: SUPABASE_SERVICE_ROLE_KEY,
     Authorization:
       "Bearer " + SUPABASE_SERVICE_ROLE_KEY,
-    "Content-Type": "application/json",
+    "Content-Type": "application/json"
   };
 }
 
-async function supabaseRequest(endpoint, options = {}) {
+
+// ======================================
+// REQUISIÇÃO SUPABASE
+// ======================================
+
+async function supabaseRequest(
+  endpoint,
+  options = {}
+) {
   checkEnv();
 
   const response = await fetch(
     SUPABASE_URL + "/rest/v1/" + endpoint,
     {
       ...options,
+
       headers: {
         ...supabaseHeaders(),
         Prefer: "return=representation",
-        ...(options.headers || {}),
-      },
+        ...(options.headers || {})
+      }
     }
   );
 
@@ -87,6 +117,11 @@ async function supabaseRequest(endpoint, options = {}) {
   return data;
 }
 
+
+// ======================================
+// VALIDAR NÚMERO
+// ======================================
+
 function validNumber(value) {
   const number = Number(value);
 
@@ -100,6 +135,11 @@ function validNumber(value) {
   return number;
 }
 
+
+// ======================================
+// TOKEN ADMIN
+// ======================================
+
 function getToken(req) {
   const authorization =
     req.get("authorization") || "";
@@ -110,6 +150,11 @@ function getToken(req) {
 
   return authorization.slice(7);
 }
+
+
+// ======================================
+// PROTEGER ROTAS ADMIN
+// ======================================
 
 function requireAdmin(req, res, next) {
   const token = getToken(req);
@@ -126,18 +171,33 @@ function requireAdmin(req, res, next) {
 
     return res.status(401).json({
       ok: false,
-      error: "Sessão inválida ou expirada.",
+      error: "Sessão inválida ou expirada."
     });
   }
 
   next();
 }
 
+
+// ======================================
+// BUSCAR COTAÇÕES
+// ======================================
+
 async function getQuote() {
   const rows = await supabaseRequest(
-    "quotes?id=eq.main&select=id,brl_to_bob,bob_to_brl,updated_at",
+    "quotes?id=eq.main&select=" +
+    [
+      "id",
+      "brl_to_bob",
+      "bob_to_brl",
+      "cliente_brl_to_bob",
+      "cliente_bob_to_brl",
+      "cambista_brl_to_bob",
+      "cambista_bob_to_brl",
+      "updated_at"
+    ].join(","),
     {
-      method: "GET",
+      method: "GET"
     }
   );
 
@@ -152,54 +212,77 @@ async function getQuote() {
 
   return rows[0];
 }
-/* COTAÇÃO PÚBLICA */
+
+
+// ======================================
+// COTAÇÃO PÚBLICA
+// ======================================
 
 app.get("/api/quotes", async (req, res) => {
   try {
     const quote = await getQuote();
 
+    const brlToBob =
+      quote.cliente_brl_to_bob ??
+      quote.brl_to_bob;
+
+    const bobToBrl =
+      quote.cliente_bob_to_brl ??
+      quote.bob_to_brl;
+
     res.set("Cache-Control", "no-store");
 
     return res.json({
       ok: true,
+
       updatedAt: quote.updated_at,
+
       source: "Câmbio Cortez",
+
       methodology: "Cotação manual",
+
       quote: {
         brl_to_bob:
-          quote.brl_to_bob === null
+          brlToBob === null ||
+          brlToBob === undefined
             ? null
-            : Number(quote.brl_to_bob),
+            : Number(brlToBob),
 
         bob_to_brl:
-          quote.bob_to_brl === null
+          bobToBrl === null ||
+          bobToBrl === undefined
             ? null
-            : Number(quote.bob_to_brl),
-      },
+            : Number(bobToBrl)
+      }
     });
+
   } catch (error) {
     console.error(error);
 
     return res.status(500).json({
       ok: false,
-      error: error.message,
+      error: error.message
     });
   }
 });
 
 
-/* LOGIN */
+// ======================================
+// LOGIN ADMIN
+// ======================================
 
 app.post("/api/admin/login", (req, res) => {
   try {
     checkEnv();
 
-    const password = String(
-      req.body?.password || ""
-    );
+    const password =
+      String(req.body?.password || "");
 
-    const received = Buffer.from(password);
-    const expected = Buffer.from(ADMIN_PASSWORD);
+    const received =
+      Buffer.from(password);
+
+    const expected =
+      Buffer.from(ADMIN_PASSWORD);
 
     let correct = false;
 
@@ -213,7 +296,8 @@ app.post("/api/admin/login", (req, res) => {
     if (!correct) {
       return res.status(401).json({
         ok: false,
-        error: "Senha incorreta.",
+        error: "Senha
+                  error: "Senha incorreta."
       });
     }
 
@@ -228,20 +312,23 @@ app.post("/api/admin/login", (req, res) => {
 
     return res.json({
       ok: true,
-      token,
+      token
     });
+
   } catch (error) {
     console.error(error);
 
     return res.status(500).json({
       ok: false,
-      error: "Erro no painel administrativo.",
+      error: "Erro no painel administrativo."
     });
   }
 });
 
 
-/* CARREGAR COTAÇÕES NO ADMIN */
+// ======================================
+// CARREGAR COTAÇÕES NO ADMIN
+// ======================================
 
 app.get(
   "/api/admin/quotes",
@@ -252,47 +339,70 @@ app.get(
 
       return res.json({
         ok: true,
-        data: quote,
+        data: quote
       });
+
     } catch (error) {
       console.error(error);
 
       return res.status(500).json({
         ok: false,
-        error: error.message,
+        error: error.message
       });
     }
   }
 );
 
 
-/* SALVAR COTAÇÕES */
+// ======================================
+// SALVAR AS 4 COTAÇÕES
+// ======================================
 
 app.put(
   "/api/admin/quotes",
   requireAdmin,
   async (req, res) => {
-    const brlToBob = validNumber(
-      req.body?.brlToBob
-    );
 
-    const bobToBrl = validNumber(
-      req.body?.bobToBrl
-    );
+    const clienteBrlToBob =
+      validNumber(req.body?.clienteBrlToBob);
 
-    if (brlToBob === null) {
+    const clienteBobToBrl =
+      validNumber(req.body?.clienteBobToBrl);
+
+    const cambistaBrlToBob =
+      validNumber(req.body?.cambistaBrlToBob);
+
+    const cambistaBobToBrl =
+      validNumber(req.body?.cambistaBobToBrl);
+        if (clienteBrlToBob === null) {
       return res.status(400).json({
         ok: false,
         error:
-          "Digite a cotação REAL → BOLIVIANO.",
+          "Digite uma cotação válida de CLIENTE para REAL → BOLIVIANO."
       });
     }
 
-    if (bobToBrl === null) {
+    if (clienteBobToBrl === null) {
       return res.status(400).json({
         ok: false,
         error:
-          "Digite a cotação BOLIVIANO → REAL.",
+          "Digite uma cotação válida de CLIENTE para BOLIVIANO → REAL."
+      });
+    }
+
+    if (cambistaBrlToBob === null) {
+      return res.status(400).json({
+        ok: false,
+        error:
+          "Digite uma cotação válida de CAMBISTA para REAL → BOLIVIANO."
+      });
+    }
+
+    if (cambistaBobToBrl === null) {
+      return res.status(400).json({
+        ok: false,
+        error:
+          "Digite uma cotação válida de CAMBISTA para BOLIVIANO → REAL."
       });
     }
 
@@ -301,68 +411,45 @@ app.put(
         "quotes?id=eq.main",
         {
           method: "PATCH",
+
           body: JSON.stringify({
-            brl_to_bob: brlToBob,
-            bob_to_brl: bobToBrl,
+            cliente_brl_to_bob:
+              clienteBrlToBob,
+
+            cliente_bob_to_brl:
+              clienteBobToBrl,
+
+            cambista_brl_to_bob:
+              cambistaBrlToBob,
+
+            cambista_bob_to_brl:
+              cambistaBobToBrl,
+
+            brl_to_bob:
+              clienteBrlToBob,
+
+            bob_to_brl:
+              clienteBobToBrl,
+
             updated_at:
-              new Date().toISOString(),
-          }),
+              new Date().toISOString()
+          })
         }
       );
 
       return res.json({
         ok: true,
-        data: rows?.[0] || null,
+        data: rows?.[0] || null
       });
+
     } catch (error) {
       console.error(error);
 
       return res.status(500).json({
         ok: false,
         error:
-          "Não foi possível salvar as cotações.",
+          "Não foi possível salvar as cotações."
       });
     }
   }
 );
-/* LOGOUT */
-
-app.post(
-  "/api/admin/logout",
-  requireAdmin,
-  (req, res) => {
-    sessions.delete(getToken(req));
-
-    return res.json({
-      ok: true,
-    });
-  }
-);
-
-
-/* ADMIN */
-
-app.get("/admin", (req, res) => {
-  res.sendFile(
-    path.join(__dirname, "admin.html")
-  );
-});
-
-
-/* TESTE */
-
-app.get("/api/health", (req, res) => {
-  res.json({
-    ok: true,
-    service: "Câmbio Cortez",
-  });
-});
-
-
-/* INICIAR */
-
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(
-    "Câmbio Cortez iniciado na porta " + PORT
-  );
-});
