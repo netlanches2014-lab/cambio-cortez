@@ -84,14 +84,21 @@ document.getElementById("cambistaBobToBrl").value =
 async function saveQuotes() {
   adminMsg.textContent = "Salvando...";
 
-  try {
-    const brlToBob = Number(
-      document.getElementById("brlToBob").value
-    );
+  const clienteBrlToBob = Number(
+  document.getElementById("clienteBrlToBob").value
+);
 
-    const bobToBrl = Number(
-      document.getElementById("bobToBrl").value
-    );
+const clienteBobToBrl = Number(
+  document.getElementById("clienteBobToBrl").value
+);
+
+const cambistaBrlToBob = Number(
+  document.getElementById("cambistaBrlToBob").value
+);
+
+const cambistaBobToBrl = Number(
+  document.getElementById("cambistaBobToBrl").value
+);
 
     if (!Number.isFinite(brlToBob) || brlToBob <= 0) {
       throw new Error(
