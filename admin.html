@@ -168,44 +168,82 @@ HU<!DOCTYPE html>
         ● Painel conectado
       </div>
 
-      <div class="rate-box">
-        <label for="brlToBob">
-          🇧🇷 REAL → BOLIVIANO 🇧🇴
-        </label>
+      
+<h2>Taxas para CLIENTES</h2>
 
-        <input
-          id="brlToBob"
-          type="number"
-          step="0.01"
-          inputmode="decimal"
-          placeholder="Ex.: 2.20"
-        >
+<div class="rate-box">
+  <label for="clienteBrlToBob">
+    🇧🇷 REAL → BOLIVIANO 🇧🇴
+  </label>
 
-        <small>
-          Quantos bolivianos você paga por cada R$ 1 recebido.
-        </small>
-      </div>
+  <input
+    id="clienteBrlToBob"
+    type="number"
+    step="0.001"
+    inputmode="decimal"
+    placeholder="Ex: 2.165"
+  >
 
+  <small>
+    Cotação aplicada aos clientes.
+  </small>
+</div>
 
-      <div class="rate-box">
-        <label for="bobToBrl">
-          🇧🇴 BOLIVIANO → REAL 🇧🇷
-        </label>
+<div class="rate-box">
+  <label for="clienteBobToBrl">
+    🇧🇴 BOLIVIANO → REAL 🇧🇷
+  </label>
 
-        <input
-          id="bobToBrl"
-          type="number"
-          step="0.01"
-          inputmode="decimal"
-          placeholder="Ex.: 2.18"
-        >
+  <input
+    id="clienteBobToBrl"
+    type="number"
+    step="0.001"
+    inputmode="decimal"
+    placeholder="Ex: 2.190"
+  >
 
-        <small>
-          Quantos bolivianos você recebe para pagar R$ 1.
-        </small>
-      </div>
+  <small>
+    Cotação aplicada aos clientes.
+  </small>
+</div>
 
+<h2>Taxas para CAMBISTAS</h2>
 
+<div class="rate-box">
+  <label for="cambistaBrlToBob">
+    🇧🇷 REAL → BOLIVIANO 🇧🇴
+  </label>
+
+  <input
+    id="cambistaBrlToBob"
+    type="number"
+    step="0.001"
+    inputmode="decimal"
+    placeholder="Ex: 2.170"
+  >
+
+  <small>
+    Cotação especial para cambistas.
+  </small>
+</div>
+
+<div class="rate-box">
+  <label for="cambistaBobToBrl">
+    🇧🇴 BOLIVIANO → REAL 🇧🇷
+  </label>
+
+  <input
+    id="cambistaBobToBrl"
+    type="number"
+    step="0.001"
+    inputmode="decimal"
+    placeholder="Ex: 2.185"
+  >
+
+  <small>
+    Cotação especial para cambistas.
+  </small>
+</div>
       <button id="saveBtn">
         Salvar cotações
       </button>
