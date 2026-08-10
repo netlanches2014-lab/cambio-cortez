@@ -100,17 +100,41 @@ const cambistaBobToBrl = Number(
   document.getElementById("cambistaBobToBrl").value
 );
 
-    if (!Number.isFinite(brlToBob) || brlToBob <= 0) {
-      throw new Error(
-        "Digite um valor válido para REAL → BOLIVIANO."
-      );
-    }
+    if (
+  !Number.isFinite(clienteBrlToBob) ||
+  clienteBrlToBob <= 0
+) {
+  throw new Error(
+    "Digite uma taxa válida de CLIENTE para REAL → BOLIVIANO."
+  );
+}
 
-    if (!Number.isFinite(bobToBrl) || bobToBrl <= 0) {
-      throw new Error(
-        "Digite um valor válido para BOLIVIANO → REAL."
-      );
-    }
+if (
+  !Number.isFinite(clienteBobToBrl) ||
+  clienteBobToBrl <= 0
+) {
+  throw new Error(
+    "Digite uma taxa válida de CLIENTE para BOLIVIANO → REAL."
+  );
+}
+
+if (
+  !Number.isFinite(cambistaBrlToBob) ||
+  cambistaBrlToBob <= 0
+) {
+  throw new Error(
+    "Digite uma taxa válida de CAMBISTA para REAL → BOLIVIANO."
+  );
+}
+
+if (
+  !Number.isFinite(cambistaBobToBrl) ||
+  cambistaBobToBrl <= 0
+) {
+  throw new Error(
+    "Digite uma taxa válida de CAMBISTA para BOLIVIANO → REAL."
+  );
+}
 
     const response = await fetch("/api/admin/quotes", {
       method: "PUT",
