@@ -411,3 +411,25 @@ footer p {
   text-align: center;
   opacity: 0.9;
 }
+.copy-quote-button {
+  width: 100%;
+  margin-top: 12px;
+  padding: 13px 18px;
+
+  background: transparent;
+  border: 1px solid #d9ad43;
+  border-radius: 10px;
+
+  color: #d9ad43;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.copy-quote-button:active {
+  transform: scale(0.98);
+  background: rgba(217, 173, 67, 0.12);
+}
