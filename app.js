@@ -266,5 +266,85 @@ $("accessButton").addEventListener("click", () => {
 
   loadQuotes();
 });
+$("whatsappButton").addEventListener("click", () => {
+  const amount = Number($("amount").value);
+  const fromCurrency = $("fromCurrency").value;
+  const toCurrency = $("toCurrency").value;
+
+  const result = convertCurrency(
+    amount,
+    fromCurrency,
+    toCurrency
+  );
+
+  if (!result || !Number.isFinite(amount) || amount <= 0) {
+    alert("Digite um valor válido para fazer o câmbio.");
+    return;
+  }
+
+  let valorReal;
+  let valorBoliviano;
+
+  if (fromCurrency === "BRL") {
+    valorReal = amount;
+    valorBoliviano = result.value;
+  } else {
+    valorBoliviano = amount;
+    valorReal = result.value;
+  }
+
+  const agora = new Date();
+
+  const dataHora = agora.toLocaleString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+
+  const valorRealFormatado =
+    valorReal.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
+
+  const valorBolivianoFormatado =
+    valorBoliviano.toLocaleString("pt-BR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }) + " Bs";
+
+  const operacao =
+    fromCurrency === "BRL"
+      ? "REAL → BOLIVIANO"
+      : "BOLIVIANO → REAL";
+
+  const mensagem =
+`⚔️ CÂMBIO CORTEZ
+
+📅 Data e horário:
+${dataHora}
+
+🔄 Operação:
+${operacao}
+
+💱 Cotação:
+${result.rateText}
+
+🇧🇷 Valor em Real:
+${valorRealFormatado}
+
+🇧🇴 Valor em Bolivianos:
+${valorBolivianoFormatado}
+
+Gostaria de finalizar este câmbio.`;
+
+  const whatsappUrl =
+    "https://wa.me/?text=" +
+    encodeURIComponent(mensagem);
+
+  window.open(whatsappUrl, "_blank");
+});
 
 loadQuotes();
