@@ -337,7 +337,8 @@ ${valorRealFormatado}
 
 🇧🇴 Valor em Bolivianos:
 ${valorBolivianoFormatado}
-
+⏱️ Validade da cotação:
+10 minutos
 Gostaria de finalizar este câmbio.`;
 
   const whatsappUrl =
