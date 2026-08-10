@@ -142,10 +142,41 @@ if (
         "Content-Type": "application/json",
         Authorization: "Bearer " + token
       },
-      body: JSON.stringify({
-        brlToBob,
-        bobToBrl
-      })
+      if (
+  !Number.isFinite(clienteBrlToBob) ||
+  clienteBrlToBob <= 0
+) {
+  throw new Error(
+    "Digite uma taxa válida de CLIENTE para REAL → BOLIVIANO."
+  );
+}
+
+if (
+  !Number.isFinite(clienteBobToBrl) ||
+  clienteBobToBrl <= 0
+) {
+  throw new Error(
+    "Digite uma taxa válida de CLIENTE para BOLIVIANO → REAL."
+  );
+}
+
+if (
+  !Number.isFinite(cambistaBrlToBob) ||
+  cambistaBrlToBob <= 0
+) {
+  throw new Error(
+    "Digite uma taxa válida de CAMBISTA para REAL → BOLIVIANO."
+  );
+}
+
+if (
+  !Number.isFinite(cambistaBobToBrl) ||
+  cambistaBobToBrl <= 0
+) {
+  throw new Error(
+    "Digite uma taxa válida de CAMBISTA para BOLIVIANO → REAL."
+  );
+}
     });
 
     const data = await response.json();
