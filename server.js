@@ -296,7 +296,7 @@ app.post("/api/admin/login", (req, res) => {
     if (!correct) {
       return res.status(401).json({
         ok: false,
-        error: "Senha
+       
                   error: "Senha incorreta."
       });
     }
