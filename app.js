@@ -129,16 +129,19 @@ function renderQuotes() {
   }
 
   $("crossBuy").textContent =
-    rates.brlToBob.toLocaleString("pt-BR", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 4,
-    }) + " Bs";
+  "1 REAL = " +
+  rates.brlToBob.toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 4,
+  }) +
+  " Bs";
 
   $("crossSell").textContent =
-    rates.bobToBrl.toLocaleString("pt-BR", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 4,
-    }) + " Bs";
+  rates.bobToBrl.toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 4,
+  }) +
+  " Bs = 1 REAL";
 
   const updatedAt =
     state.data.updatedAt ||
