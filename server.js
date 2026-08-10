@@ -453,3 +453,59 @@ app.put(
     }
   }
 );
+// ======================================
+// LOGOUT
+// ======================================
+
+app.post(
+  "/api/admin/logout",
+  requireAdmin,
+  (req, res) => {
+
+    sessions.delete(
+      getToken(req)
+    );
+
+    return res.json({
+      ok: true
+    });
+  }
+);
+
+
+// ======================================
+// PÁGINA ADMIN
+// ======================================
+
+app.get("/admin", (req, res) => {
+  res.sendFile(
+    path.join(
+      __dirname,
+      "admin.html"
+    )
+  );
+});
+
+
+// ======================================
+// TESTE DO SERVIDOR
+// ======================================
+
+app.get("/api/health", (req, res) => {
+  res.json({
+    ok: true,
+    service: "Câmbio Cortez"
+  });
+});
+
+
+// ======================================
+// INICIAR SERVIDOR
+// ======================================
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(
+    "Câmbio Cortez iniciado na porta " +
+    PORT
+  );
+});
