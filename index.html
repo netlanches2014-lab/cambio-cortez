@@ -19,31 +19,71 @@
 
   <section id="accessScreen" class="access-screen">
 
-    <div class="access-card">
+  <div class="access-card">
 
-      <div class="spartan-logo">⚔️</div>
+    <div class="spartan-logo">⚔️</div>
 
-      <p class="eyebrow">COTAÇÃO DIRETA</p>
+    <p class="eyebrow">COTAÇÃO DIRETA</p>
 
-      <h1>
-        CÂMBIO
-        <span>CORTEZ</span>
-      </h1>
+    <h1>
+      CÂMBIO
+      <span>CORTEZ</span>
+    </h1>
 
-      <p class="intro">
-        Real e Boliviano em um painel simples,
-        rápido e preparado para celular.
-      </p>
+    <p class="intro">
+      Entre na sua conta ou faça seu cadastro
+      para acessar suas cotações.
+    </p>
 
-      <button id="accessButton" class="gold-button">
-        ACESSAR COTAÇÕES
+    <div id="authForms">
+
+      <input
+        id="authName"
+        type="text"
+        placeholder="Seu nome"
+        autocomplete="name"
+      >
+
+      <input
+        id="authEmail"
+        type="email"
+        placeholder="Seu e-mail"
+        autocomplete="email"
+      >
+
+      <input
+        id="authPassword"
+        type="password"
+        placeholder="Sua senha"
+        autocomplete="current-password"
+      >
+
+      <button
+        id="loginUserButton"
+        class="gold-button"
+      >
+        ENTRAR
       </button>
 
-      <small>Não exige cadastro</small>
-<p class="professional-use">
-  ⚠️ Uso exclusivo para cambistas
-</p>
+      <button
+        id="signupUserButton"
+        class="copy-button"
+      >
+        CRIAR CADASTRO
+      </button>
+
+      <div
+        id="authMessage"
+        class="error-message hidden"
+      ></div>
+
     </div>
+
+    <small>
+      Todo novo cadastro entra automaticamente como cliente.
+    </small>
+
+  </div>
 
   </section>
 
