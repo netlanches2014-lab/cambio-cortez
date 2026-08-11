@@ -1,8 +1,13 @@
-HU<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
 
   <title>Câmbio Cortez - Painel Administrativo</title>
 
@@ -11,65 +16,119 @@ HU<!DOCTYPE html>
       box-sizing: border-box;
     }
 
+    html {
+      width: 100%;
+      min-height: 100%;
+      background: #050505;
+    }
+
     body {
       margin: 0;
+      width: 100%;
       min-height: 100vh;
-      font-family: Arial, Helvetica, sans-serif;
+
+      font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
       background: #050505;
       color: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
+
+      overflow-x: hidden;
+      overflow-y: auto;
+
+      padding: 24px 16px 60px;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 620px;
+      margin: 0 auto;
     }
 
     .card {
       width: 100%;
-      max-width: 620px;
-      background: #151515;
+
+      background:
+        linear-gradient(
+          180deg,
+          #171717 0%,
+          #101010 100%
+        );
+
       border: 1px solid #6b5421;
       border-radius: 28px;
-      padding: 36px;
+
+      padding: 28px 22px;
+
+      box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.45);
     }
 
     h1 {
       margin: 0 0 8px;
+
       color: #f5c451;
+
       font-size: 34px;
+      line-height: 1.1;
+    }
+
+    h2 {
+      margin:
+        34px 0 18px;
+
+      color: #ffffff;
+
+      font-size: 28px;
+      line-height: 1.15;
     }
 
     .subtitle {
       color: #aaaaaa;
-      margin-bottom: 30px;
-      font-size: 18px;
+
+      margin-bottom: 28px;
+
+      font-size: 17px;
     }
 
     .status {
       color: #67d99a;
+
       margin-bottom: 28px;
+
       font-size: 18px;
     }
 
     .hidden {
-      display: none;
+      display: none !important;
     }
 
     label {
       display: block;
-      margin-bottom: 8px;
-      color: #eeeeee;
+
+      margin-bottom: 10px;
+
+      color: #ffffff;
+
       font-size: 18px;
       font-weight: bold;
     }
 
     input {
       width: 100%;
-      padding: 16px;
-      border-radius: 14px;
-      border: 1px solid #444;
+
+      padding: 18px;
+
+      border: 1px solid #444444;
+      border-radius: 16px;
+
       background: #080808;
-      color: #fff;
+      color: #ffffff;
+
       font-size: 20px;
+
       outline: none;
     }
 
@@ -78,53 +137,100 @@ HU<!DOCTYPE html>
     }
 
     .rate-box {
+      width: 100%;
+
       background: #0b0b0b;
-      border: 1px solid #222;
-      border-radius: 18px;
+
+      border: 1px solid #292929;
+      border-radius: 22px;
+
       padding: 20px;
+
       margin-bottom: 20px;
     }
 
     .rate-box small {
       display: block;
-      margin-top: 10px;
+
+      margin-top: 14px;
+
       color: #9a9a9a;
+
       line-height: 1.5;
+
       font-size: 15px;
     }
 
     button {
       width: 100%;
+
       border: 0;
-      border-radius: 14px;
-      padding: 16px;
+      border-radius: 16px;
+
+      padding: 17px;
+
       margin-top: 16px;
-      background: #f5c451;
-      color: #111;
+
+      background:
+        linear-gradient(
+          135deg,
+          #ffd76a,
+          #e9b52d
+        );
+
+      color: #111111;
+
       font-size: 18px;
-      font-weight: bold;
+      font-weight: 800;
+
       cursor: pointer;
     }
 
     button.secondary {
       background: #2a2a2a;
-      color: #fff;
+      color: #ffffff;
     }
 
     .msg {
-      margin-top: 16px;
       min-height: 24px;
+
+      margin-top: 16px;
+
       color: #f5c451;
+
       font-size: 16px;
+
+      text-align: center;
+    }
+
+    .spacer {
+      height: 20px;
     }
 
     @media (max-width: 600px) {
+
+      body {
+        padding:
+          16px 12px 50px;
+      }
+
       .card {
-        padding: 28px 22px;
+        padding:
+          24px 18px;
+
+        border-radius: 22px;
       }
 
       h1 {
         font-size: 30px;
+      }
+
+      h2 {
+        font-size: 26px;
+      }
+
+      input {
+        font-size: 20px;
       }
     }
   </style>
@@ -132,136 +238,179 @@ HU<!DOCTYPE html>
 
 <body>
 
-  <div class="card">
+  <main class="page">
 
-    <div id="loginBox">
-      <h1>Câmbio Cortez</h1>
+    <div class="card">
 
-      <div class="subtitle">
-        Painel administrativo
+      <!-- LOGIN -->
+
+      <div id="loginBox">
+
+        <h1>Câmbio Cortez</h1>
+
+        <div class="subtitle">
+          Painel administrativo
+        </div>
+
+        <label for="password">
+          Senha do administrador
+        </label>
+
+        <input
+          id="password"
+          type="password"
+          autocomplete="current-password"
+          placeholder="Digite sua senha"
+        >
+
+        <button id="loginBtn">
+          Entrar
+        </button>
+
+        <div
+          id="loginMsg"
+          class="msg"
+        ></div>
+
       </div>
 
-      <label for="password">
-        Senha do administrador
-      </label>
 
-      <input
-        id="password"
-        type="password"
-        autocomplete="current-password"
-        placeholder="Digite sua senha"
+      <!-- PAINEL -->
+
+      <div
+        id="adminBox"
+        class="hidden"
       >
 
-      <button id="loginBtn">
-        Entrar
-      </button>
+        <h1>Cotações</h1>
 
-      <div id="loginMsg" class="msg"></div>
-    </div>
+        <div class="status">
+          ● Painel conectado
+        </div>
 
 
-    <div id="adminBox" class="hidden">
+        <!-- CLIENTES -->
 
-      <h1>Cotações</h1>
+        <h2>
+          Taxas para CLIENTES
+        </h2>
 
-      <div class="status">
-        ● Painel conectado
+        <div class="rate-box">
+
+          <label for="clienteBrlToBob">
+            🇧🇷 REAL → BOLIVIANO 🇧🇴
+          </label>
+
+          <input
+            id="clienteBrlToBob"
+            type="number"
+            step="0.001"
+            inputmode="decimal"
+            placeholder="Ex: 2.165"
+          >
+
+          <small>
+            Cotação aplicada aos clientes.
+          </small>
+
+        </div>
+
+
+        <div class="rate-box">
+
+          <label for="clienteBobToBrl">
+            🇧🇴 BOLIVIANO → REAL 🇧🇷
+          </label>
+
+          <input
+            id="clienteBobToBrl"
+            type="number"
+            step="0.001"
+            inputmode="decimal"
+            placeholder="Ex: 2.190"
+          >
+
+          <small>
+            Cotação aplicada aos clientes.
+          </small>
+
+        </div>
+
+
+        <!-- CAMBISTAS -->
+
+        <h2>
+          Taxas para CAMBISTAS
+        </h2>
+
+        <div class="rate-box">
+
+          <label for="cambistaBrlToBob">
+            🇧🇷 REAL → BOLIVIANO 🇧🇴
+          </label>
+
+          <input
+            id="cambistaBrlToBob"
+            type="number"
+            step="0.001"
+            inputmode="decimal"
+            placeholder="Ex: 2.170"
+          >
+
+          <small>
+            Cotação especial para cambistas.
+          </small>
+
+        </div>
+
+
+        <div class="rate-box">
+
+          <label for="cambistaBobToBrl">
+            🇧🇴 BOLIVIANO → REAL 🇧🇷
+          </label>
+
+          <input
+            id="cambistaBobToBrl"
+            type="number"
+            step="0.001"
+            inputmode="decimal"
+            placeholder="Ex: 2.185"
+          >
+
+          <small>
+            Cotação especial para cambistas.
+          </small>
+
+        </div>
+
+
+        <button id="saveBtn">
+          Salvar cotações
+        </button>
+
+        <button
+          id="logoutBtn"
+          class="secondary"
+        >
+          Sair
+        </button>
+
+        <div
+          id="adminMsg"
+          class="msg"
+        ></div>
+
+        <div class="spacer"></div>
+
       </div>
 
-      
-<h2>Taxas para CLIENTES</h2>
+    </div>
 
-<div class="rate-box">
-  <label for="clienteBrlToBob">
-    🇧🇷 REAL → BOLIVIANO 🇧🇴
-  </label>
+  </main>
 
-  <input
-    id="clienteBrlToBob"
-    type="number"
-    step="0.001"
-    inputmode="decimal"
-    placeholder="Ex: 2.165"
-  >
-
-  <small>
-    Cotação aplicada aos clientes.
-  </small>
-</div>
-
-<div class="rate-box">
-  <label for="clienteBobToBrl">
-    🇧🇴 BOLIVIANO → REAL 🇧🇷
-  </label>
-
-  <input
-    id="clienteBobToBrl"
-    type="number"
-    step="0.001"
-    inputmode="decimal"
-    placeholder="Ex: 2.190"
-  >
-
-  <small>
-    Cotação aplicada aos clientes.
-  </small>
-</div>
-
-<h2>Taxas para CAMBISTAS</h2>
-
-<div class="rate-box">
-  <label for="cambistaBrlToBob">
-    🇧🇷 REAL → BOLIVIANO 🇧🇴
-  </label>
-
-  <input
-    id="cambistaBrlToBob"
-    type="number"
-    step="0.001"
-    inputmode="decimal"
-    placeholder="Ex: 2.170"
-  >
-
-  <small>
-    Cotação especial para cambistas.
-  </small>
-</div>
-
-<div class="rate-box">
-  <label for="cambistaBobToBrl">
-    🇧🇴 BOLIVIANO → REAL 🇧🇷
-  </label>
-
-  <input
-    id="cambistaBobToBrl"
-    type="number"
-    step="0.001"
-    inputmode="decimal"
-    placeholder="Ex: 2.185"
-  >
-
-  <small>
-    Cotação especial para cambistas.
-  </small>
-</div>
-      <button id="saveBtn">
-        Salvar cotações
-      </button>
-
-      <button
-  id="logoutBtn"
-  class="secondary"
->
-  Sair
-</button>
-
-<div id="adminMsg" class="msg"></div>
-
-</div>
-</div>
-
-<script src="/admin.js"></script>
+  <script src="/admin.js"></script>
 
 </body>
+
 </html>
-        
