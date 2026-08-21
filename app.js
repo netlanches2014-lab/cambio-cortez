@@ -902,5 +902,35 @@ $("copyQuoteButton")?.addEventListener(
 // ======================================
 // INICIAR
 // ======================================
+// ======================================
+// ATUALIZAR PERFIL E COTAÇÃO AUTOMATICAMENTE
+// ======================================
 
+// Quando o usuário volta para esta aba
+window.addEventListener("focus", () => {
+  if (getUserToken()) {
+    loadQuotes();
+  }
+});
+
+// Quando volta para a página depois de deixá-la em segundo plano
+document.addEventListener("visibilitychange", () => {
+  if (
+    document.visibilityState === "visible" &&
+    getUserToken()
+  ) {
+    loadQuotes();
+  }
+});
+
+// Confere o tipo do usuário automaticamente
+// a cada 15 segundos
+setInterval(() => {
+  if (
+    getUserToken() &&
+    !$("app")?.classList.contains("hidden")
+  ) {
+    loadQuotes();
+  }
+}, 15000);
 restoreSession();
