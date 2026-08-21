@@ -44,63 +44,102 @@
 
   <style>
 
-    .brand-logo {
-      width: 74px;
-      height: 74px;
-      object-fit: contain;
-      border-radius: 18px;
-    }
+    /* ===================================
+       TOPO / LOGO
+    =================================== */
 
-    .login-logo {
-      display: block;
-      width: 210px;
-      max-width: 80%;
-      height: auto;
-      object-fit: contain;
-      margin: 0 auto 20px;
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+
+      padding-top: 22px;
+      padding-bottom: 18px;
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 14px;
+      flex: 1;
+      min-width: 0;
     }
 
+    .brand-logo {
+      display: block;
+
+      width: 210px;
+      max-width: 62vw;
+      height: auto;
+
+      object-fit: contain;
+
+      margin: 0;
+    }
+
+    .login-logo {
+      display: block;
+
+      width: 270px;
+      max-width: 88%;
+
+      height: auto;
+
+      object-fit: contain;
+
+      margin: 0 auto 22px;
+    }
+
+    .status {
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+
+    /* ===================================
+       COTAÇÃO POR VOLUME
+    =================================== */
+
     .volume-info {
-      margin: 0 30px 16px;
+      margin: 0 30px 28px;
 
-      padding: 18px;
+      padding: 22px 24px;
 
-      border: 1px solid rgba(245, 196, 81, 0.35);
-      border-radius: 20px;
+      border:
+        1px solid rgba(245, 196, 81, 0.48);
+
+      border-radius: 24px;
 
       background:
         linear-gradient(
           180deg,
-          rgba(245, 196, 81, 0.07),
-          rgba(245, 196, 81, 0.02)
+          rgba(245, 196, 81, 0.08),
+          rgba(245, 196, 81, 0.025)
         );
     }
 
     .volume-info strong {
       display: block;
 
+      margin-bottom: 9px;
+
       color: #ffffff;
 
-      font-size: 18px;
-
-      line-height: 1.4;
-
-      margin-bottom: 5px;
+      font-size: 20px;
+      line-height: 1.45;
     }
 
     .volume-info small {
       color: #b5b5b5;
 
-      font-size: 14px;
-
-      line-height: 1.5;
+      font-size: 15px;
+      line-height: 1.55;
     }
+
+
+    /* ===================================
+       MENSAGEM NO CONVERSOR
+    =================================== */
 
     .volume-message {
       margin-top: 18px;
@@ -122,16 +161,48 @@
       font-size: 14px;
     }
 
+
+    /* ===================================
+       CELULAR
+    =================================== */
+
     @media (max-width: 600px) {
 
+      .topbar {
+        align-items: center;
+
+        padding-top: 16px;
+        padding-bottom: 18px;
+      }
+
       .brand-logo {
-        width: 64px;
-        height: 64px;
+        width: 195px;
+        max-width: 57vw;
+      }
+
+      .status {
+        font-size: 15px;
       }
 
       .volume-info {
         margin-left: 20px;
         margin-right: 20px;
+
+        padding: 21px 20px;
+      }
+
+    }
+
+
+    @media (max-width: 390px) {
+
+      .brand-logo {
+        width: 170px;
+        max-width: 55vw;
+      }
+
+      .status {
+        font-size: 13px;
       }
 
     }
@@ -155,20 +226,18 @@
 
     <div class="access-card">
 
+
       <img
         src="/logo-cortez-sarmentos.png"
         alt="Cortez e Sarmentos Câmbios"
         class="login-logo"
       >
 
+
       <p class="eyebrow">
         COTAÇÃO DIRETA
       </p>
 
-      <h1>
-        CORTEZ E SARMENTOS
-        <span>CÂMBIOS</span>
-      </h1>
 
       <p class="intro">
         Entre na sua conta ou faça seu cadastro
@@ -178,6 +247,7 @@
 
       <div id="authForms">
 
+
         <input
           id="authName"
           type="text"
@@ -185,12 +255,14 @@
           autocomplete="name"
         >
 
+
         <input
           id="authEmail"
           type="email"
           placeholder="Seu e-mail"
           autocomplete="email"
         >
+
 
         <input
           id="authPassword"
@@ -221,12 +293,14 @@
           class="error-message hidden"
         ></div>
 
+
       </div>
 
 
       <small>
         Todo novo cadastro entra automaticamente como cliente.
       </small>
+
 
     </div>
 
@@ -235,7 +309,7 @@
 
 
   <!-- =================================
-       APLICAÇÃO
+       PAINEL DO CLIENTE
   ================================== -->
 
   <main
@@ -244,9 +318,12 @@
   >
 
 
-    <!-- TOPO -->
+    <!-- =================================
+         TOPO
+    ================================== -->
 
     <header class="topbar">
+
 
       <div class="brand">
 
@@ -255,18 +332,6 @@
           alt="Cortez e Sarmentos Câmbios"
           class="brand-logo"
         >
-
-        <div>
-
-          <strong>
-            Cortez e Sarmentos Câmbios
-          </strong>
-
-          <span>
-            Mercado P2P
-          </span>
-
-        </div>
 
       </div>
 
@@ -278,13 +343,17 @@
         ● Conectando
       </div>
 
+
     </header>
 
 
 
-    <!-- TÍTULO -->
+    <!-- =================================
+         PAINEL AO VIVO
+    ================================== -->
 
     <section class="hero">
+
 
       <div>
 
@@ -307,33 +376,42 @@
         ↻
       </button>
 
+
     </section>
 
 
 
-    <!-- COTAÇÃO POR VOLUME -->
+    <!-- =================================
+         COTAÇÃO POR VOLUME
+    ================================== -->
 
     <section class="volume-info">
+
 
       <p class="eyebrow">
         COTAÇÃO POR VOLUME
       </p>
+
 
       <strong>
         💰 Quanto maior o valor,
         melhor sua cotação
       </strong>
 
+
       <small>
         Operações a partir de R$ 1.000
         recebem uma condição especial.
       </small>
 
+
     </section>
 
 
 
-    <!-- COTAÇÕES -->
+    <!-- =================================
+         COTAÇÕES
+    ================================== -->
 
     <section class="cards">
 
@@ -342,6 +420,7 @@
 
 
         <div class="card-title">
+
 
           <span class="flag">
             🇧🇷 ⇄ 🇧🇴
@@ -361,6 +440,7 @@
 
           </div>
 
+
         </div>
 
 
@@ -368,7 +448,10 @@
         <div class="quote-grid">
 
 
+          <!-- VENDA DE REAL -->
+
           <div>
+
 
             <small>
 
@@ -391,11 +474,15 @@
               —
             </strong>
 
+
           </div>
 
 
 
+          <!-- VENDA DE BOLIVIANO -->
+
           <div>
+
 
             <small>
 
@@ -418,30 +505,36 @@
               —
             </strong>
 
+
           </div>
 
 
         </div>
 
+
       </article>
+
 
     </section>
 
 
 
     <!-- =================================
-         CONVERSOR
+         CALCULADORA
     ================================== -->
 
     <section class="converter">
+
 
       <p class="eyebrow">
         CALCULADORA
       </p>
 
+
       <h3>
         Conversor
       </h3>
+
 
 
       <label for="amount">
@@ -449,7 +542,9 @@
       </label>
 
 
+
       <div class="input-row">
+
 
         <input
           id="amount"
@@ -463,18 +558,25 @@
 
         <select id="fromCurrency">
 
+
           <option value="BRL">
             BRL
           </option>
+
 
           <option value="BOB">
             BOB
           </option>
 
+
         </select>
+
 
       </div>
 
+
+
+      <!-- INVERTER -->
 
 
       <button
@@ -492,24 +594,31 @@
       </label>
 
 
+
       <select
         id="toCurrency"
         class="full-select"
       >
 
+
         <option value="BOB">
           BOB
         </option>
+
 
         <option value="BRL">
           BRL
         </option>
 
+
       </select>
 
 
 
-      <!-- AVISO AUTOMÁTICO -->
+      <!-- =================================
+           AVISO DA MELHOR COTAÇÃO
+      ================================== -->
+
 
       <div
         id="volumeMessage"
@@ -521,9 +630,13 @@
 
 
 
-      <!-- RESULTADO -->
+      <!-- =================================
+           RESULTADO
+      ================================== -->
+
 
       <div class="result-box">
+
 
         <small>
           RESULTADO DA OPERAÇÃO
@@ -547,14 +660,20 @@
 
 
         <div class="result-validity">
+
           ⏱ Cotação válida por 10 minutos
+
         </div>
+
 
       </div>
 
 
 
-      <!-- WHATSAPP -->
+      <!-- =================================
+           WHATSAPP
+      ================================== -->
+
 
       <button
         id="whatsappButton"
@@ -565,7 +684,10 @@
 
 
 
-      <!-- COPIAR -->
+      <!-- =================================
+           COPIAR
+      ================================== -->
+
 
       <button
         id="copyQuoteButton"
@@ -574,8 +696,14 @@
         📋 COPIAR COTAÇÃO
       </button>
 
+
     </section>
 
+
+
+    <!-- =================================
+         ERROS
+    ================================== -->
 
 
     <div
@@ -585,9 +713,13 @@
 
 
 
-    <!-- RODAPÉ -->
+    <!-- =================================
+         RODAPÉ
+    ================================== -->
+
 
     <footer>
+
 
       <div id="updatedAt">
         Última atualização: —
@@ -603,14 +735,14 @@
         Cortez e Sarmentos Câmbios
       </div>
 
+
     </footer>
 
 
   </main>
 
 
-  <script src="/app.js"></script>
 
-</body>
+  <script src="/app.js"></scy>
 
-</html>
+</html
