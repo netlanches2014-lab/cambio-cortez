@@ -1,7 +1,9 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
 
 <head>
+
   <meta charset="UTF-8">
 
   <meta
@@ -15,26 +17,37 @@
   >
 
   <title>
-    Cortez & Sarmento Câmbios - Painel Administrativo
+    Cortez e Sarmentos Câmbios - Administração
   </title>
 
+
   <style>
+
     * {
       box-sizing: border-box;
     }
 
+
     html {
       width: 100%;
       min-height: 100%;
+
       background: #050505;
     }
 
+
     body {
+
       margin: 0;
+
       width: 100%;
+
       min-height: 100vh;
 
-      font-family: Arial, Helvetica, sans-serif;
+      font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
 
       background:
         radial-gradient(
@@ -47,18 +60,27 @@
       color: #ffffff;
 
       overflow-x: hidden;
-      overflow-y: auto;
 
-      padding: 16px 12px 60px;
+      padding:
+        16px
+        12px
+        60px;
     }
+
 
     .page {
+
       width: 100%;
+
       max-width: 620px;
+
       margin: 0 auto;
+
     }
 
+
     .card {
+
       width: 100%;
 
       background:
@@ -69,69 +91,86 @@
         );
 
       border:
-        1px solid rgba(213, 161, 40, 0.45);
+        1px solid
+        rgba(213, 161, 40, 0.45);
 
       border-radius: 24px;
 
-      padding: 24px 18px;
+      padding:
+        24px
+        18px;
 
       box-shadow:
-        0 20px 50px rgba(0, 0, 0, 0.45);
+        0
+        20px
+        50px
+        rgba(0, 0, 0, 0.45);
+
     }
 
-    .logo {
-      width: 84px;
-      height: 84px;
 
-      display: grid;
-      place-items: center;
+    .admin-logo {
 
-      margin: 0 auto 18px;
+      display: block;
 
-      border:
-        1px solid rgba(213, 161, 40, 0.45);
+      width: 230px;
 
-      border-radius: 24px;
+      max-width: 85%;
 
-      background:
-        linear-gradient(
-          145deg,
-          #1d1d1d,
-          #0d0d0d
-        );
+      height: auto;
 
-      font-size: 40px;
+      object-fit: contain;
+
+      margin:
+        0 auto 20px;
+
     }
+
 
     h1 {
-      margin: 0 0 8px;
+
+      margin:
+        0 0 8px;
 
       color: #f5c451;
 
       text-align: center;
 
-      font-size: 29px;
-      line-height: 1.15;
+      font-size: 28px;
+
+      line-height: 1.2;
+
     }
 
+
     h2 {
-      margin: 34px 0 16px;
+
+      margin:
+        34px 0 16px;
 
       color: #ffffff;
 
-      font-size: 24px;
+      font-size: 25px;
+
       line-height: 1.2;
+
     }
 
+
     h3 {
-      margin: 0 0 16px;
+
+      margin:
+        0 0 16px;
 
       color: #f5c451;
 
       font-size: 20px;
+
     }
 
+
     .subtitle {
+
       margin-bottom: 28px;
 
       color: #aaaaaa;
@@ -139,23 +178,32 @@
       text-align: center;
 
       font-size: 16px;
+
       line-height: 1.5;
+
     }
 
+
     .status {
+
       margin-bottom: 24px;
 
       color: #67d99a;
 
       font-size: 16px;
+
       line-height: 1.4;
+
     }
+
 
     .hidden {
       display: none !important;
     }
 
+
     label {
+
       display: block;
 
       margin-bottom: 9px;
@@ -163,54 +211,80 @@
       color: #ffffff;
 
       font-size: 17px;
+
       font-weight: 700;
+
     }
 
+
     input {
+
       width: 100%;
 
       padding: 17px;
 
-      border: 1px solid #444444;
+      border:
+        1px solid #444444;
+
       border-radius: 15px;
 
       background: #080808;
+
       color: #ffffff;
 
       font-size: 20px;
 
       outline: none;
+
     }
+
 
     input:focus {
+
       border-color: #f5c451;
+
     }
 
+
     .section-card {
+
       margin-bottom: 22px;
 
       padding: 18px;
 
       background: #0b0b0b;
 
-      border: 1px solid #292929;
+      border:
+        1px solid #292929;
 
       border-radius: 20px;
+
     }
+
 
     .section-card.featured {
-      border-color: rgba(245, 196, 81, 0.6);
+
+      border-color:
+        rgba(245, 196, 81, 0.6);
 
       box-shadow:
-        0 0 25px rgba(245, 196, 81, 0.07);
+        0
+        0
+        25px
+        rgba(245, 196, 81, 0.07);
+
     }
 
+
     .tier-label {
+
       display: inline-block;
 
       margin-bottom: 14px;
 
-      padding: 7px 11px;
+      padding:
+        7px
+        11px;
 
       border-radius: 999px;
 
@@ -218,26 +292,36 @@
         rgba(213, 161, 40, 0.14);
 
       border:
-        1px solid rgba(213, 161, 40, 0.38);
+        1px solid
+        rgba(213, 161, 40, 0.38);
 
       color: #f5c451;
 
       font-size: 12px;
+
       font-weight: 800;
 
       text-transform: uppercase;
+
     }
+
 
     .rate-box {
+
       margin-bottom: 18px;
+
     }
+
 
     .rate-box:last-child {
+
       margin-bottom: 0;
+
     }
 
-    .rate-box small,
-    .section-help {
+
+    .rate-box small {
+
       display: block;
 
       margin-top: 9px;
@@ -245,11 +329,16 @@
       color: #9a9a9a;
 
       font-size: 14px;
+
       line-height: 1.5;
+
     }
 
+
     .volume-note {
-      margin: 18px 0 24px;
+
+      margin:
+        18px 0 24px;
 
       padding: 16px;
 
@@ -257,17 +346,22 @@
         rgba(245, 196, 81, 0.08);
 
       border:
-        1px solid rgba(245, 196, 81, 0.3);
+        1px solid
+        rgba(245, 196, 81, 0.3);
 
       border-radius: 16px;
 
       color: #f0d992;
 
       font-size: 14px;
+
       line-height: 1.5;
+
     }
 
+
     button {
+
       width: 100%;
 
       margin-top: 16px;
@@ -275,6 +369,7 @@
       padding: 17px;
 
       border: 0;
+
       border-radius: 16px;
 
       background:
@@ -287,24 +382,37 @@
       color: #111111;
 
       font-size: 17px;
+
       font-weight: 800;
 
       cursor: pointer;
+
     }
+
 
     button:disabled {
+
       opacity: 0.6;
+
       cursor: default;
+
     }
+
 
     button.secondary {
+
       background: #2a2a2a;
+
       color: #ffffff;
 
-      border: 1px solid #454545;
+      border:
+        1px solid #454545;
+
     }
 
+
     .msg {
+
       min-height: 24px;
 
       margin-top: 16px;
@@ -312,16 +420,23 @@
       color: #f5c451;
 
       font-size: 15px;
+
       line-height: 1.4;
 
       text-align: center;
+
     }
+
 
     #usersList {
+
       width: 100%;
+
     }
 
+
     .user-card {
+
       width: 100%;
 
       margin-bottom: 16px;
@@ -330,37 +445,51 @@
 
       background: #0b0b0b;
 
-      border: 1px solid #292929;
+      border:
+        1px solid #292929;
 
       border-radius: 18px;
+
     }
 
+
     .user-name {
+
       margin-bottom: 6px;
 
       color: #ffffff;
 
       font-size: 18px;
+
       font-weight: 800;
+
     }
 
+
     .user-info {
+
       margin-top: 5px;
 
       color: #a9a9a9;
 
       font-size: 14px;
+
       line-height: 1.5;
 
       word-break: break-word;
+
     }
 
+
     .user-type {
+
       display: inline-block;
 
       margin-top: 12px;
 
-      padding: 7px 12px;
+      padding:
+        7px
+        12px;
 
       border-radius: 999px;
 
@@ -368,25 +497,33 @@
         rgba(213, 161, 40, 0.14);
 
       border:
-        1px solid rgba(213, 161, 40, 0.38);
+        1px solid
+        rgba(213, 161, 40, 0.38);
 
       color: #f5c451;
 
       font-size: 13px;
+
       font-weight: 800;
 
       text-transform: uppercase;
+
     }
 
+
     .user-action {
+
       margin-top: 14px;
 
       padding: 13px;
 
       font-size: 15px;
+
     }
 
+
     .user-action.client {
+
       background:
         linear-gradient(
           135deg,
@@ -395,16 +532,24 @@
         );
 
       color: #111111;
+
     }
+
 
     .user-action.cambista {
+
       background: #2a2a2a;
+
       color: #ffffff;
 
-      border: 1px solid #454545;
+      border:
+        1px solid #454545;
+
     }
 
+
     .users-empty {
+
       padding: 20px;
 
       color: #999999;
@@ -413,44 +558,64 @@
 
       background: #0b0b0b;
 
-      border: 1px solid #292929;
+      border:
+        1px solid #292929;
 
       border-radius: 18px;
+
     }
 
+
     .spacer {
+
       height: 28px;
+
     }
+
+
   </style>
+
 </head>
 
 
 <body>
 
+
   <main class="page">
+
 
     <div class="card">
 
 
-      <!-- LOGIN ADMIN -->
+
+      <!-- =================================
+           LOGIN ADMIN
+      ================================== -->
 
       <div id="loginBox">
 
-        <div class="logo">
-          ⚔️
-        </div>
+
+        <img
+          src="/logo-cortez-sarmentos.png"
+          alt="Cortez e Sarmentos Câmbios"
+          class="admin-logo"
+        >
+
 
         <h1>
-          Cortez & Sarmento
+          Cortez e Sarmentos
         </h1>
 
+
         <div class="subtitle">
-          Câmbios · Painel administrativo
+          Câmbios · Painel Administrativo
         </div>
+
 
         <label for="password">
           Senha do administrador
         </label>
+
 
         <input
           id="password"
@@ -459,65 +624,94 @@
           placeholder="Digite sua senha"
         >
 
+
         <button id="loginBtn">
-          Entrar
+          ENTRAR
         </button>
+
 
         <div
           id="loginMsg"
           class="msg"
         ></div>
 
+
       </div>
 
 
 
-      <!-- PAINEL ADMIN -->
+
+      <!-- =================================
+           PAINEL
+      ================================== -->
 
       <div
         id="adminBox"
         class="hidden"
       >
 
+
+        <img
+          src="/logo-cortez-sarmentos.png"
+          alt="Cortez e Sarmentos Câmbios"
+          class="admin-logo"
+        >
+
+
         <h1>
           Gerenciar cotações
         </h1>
+
 
         <div class="status">
           ● Painel conectado
         </div>
 
 
+
         <div class="volume-note">
-          💰 O cliente recebe automaticamente uma
-          cotação melhor quando a operação atinge
-          R$ 1.000 ou mais.
+
+          💰 O cliente recebe automaticamente
+          uma cotação melhor quando a operação
+          atinge R$ 1.000 ou mais.
+
         </div>
 
 
 
-        <!-- CLIENTES ABAIXO DE 1000 -->
+        <!-- CLIENTES -->
 
         <h2>
-          Clientes
+          Taxas para clientes
         </h2>
+
+
+
+        <!-- ABAIXO DE R$ 1000 -->
 
         <div class="section-card">
 
+
           <div class="tier-label">
-            Abaixo de R$ 1.000
+            ABAIXO DE R$ 1.000
           </div>
+
 
           <h3>
             Taxa padrão
           </h3>
 
 
+
           <div class="rate-box">
 
+
             <label for="clienteMenorBrlToBob">
+
               🇧🇷 REAL → BOLIVIANO 🇧🇴
+
             </label>
+
 
             <input
               id="clienteMenorBrlToBob"
@@ -527,18 +721,27 @@
               placeholder="Ex: 2.150"
             >
 
+
             <small>
-              Usada quando o cliente envia menos de R$ 1.000.
+
+              Aplicada automaticamente quando
+              o cliente envia menos de R$ 1.000.
+
             </small>
 
           </div>
 
 
+
           <div class="rate-box">
 
+
             <label for="clienteMenorBobToBrl">
+
               🇧🇴 BOLIVIANO → REAL 🇧🇷
+
             </label>
+
 
             <input
               id="clienteMenorBobToBrl"
@@ -548,34 +751,42 @@
               placeholder="Ex: 2.200"
             >
 
-            <small>
-              Taxa equivalente para operações menores.
-            </small>
 
           </div>
+
 
         </div>
 
 
 
-        <!-- CLIENTES 1000 OU MAIS -->
+
+        <!-- R$ 1000 OU MAIS -->
 
         <div class="section-card featured">
 
+
           <div class="tier-label">
-            ⭐ R$ 1.000 ou mais
+
+            ⭐ R$ 1.000 OU MAIS
+
           </div>
+
 
           <h3>
             Melhor cotação
           </h3>
 
 
+
           <div class="rate-box">
 
+
             <label for="clienteMaiorBrlToBob">
+
               🇧🇷 REAL → BOLIVIANO 🇧🇴
+
             </label>
+
 
             <input
               id="clienteMaiorBrlToBob"
@@ -585,18 +796,28 @@
               placeholder="Ex: 2.180"
             >
 
+
             <small>
-              Melhor taxa para operações a partir de R$ 1.000.
+
+              Cotação especial aplicada
+              automaticamente para operações
+              a partir de R$ 1.000.
+
             </small>
 
           </div>
 
 
+
           <div class="rate-box">
 
+
             <label for="clienteMaiorBobToBrl">
+
               🇧🇴 BOLIVIANO → REAL 🇧🇷
+
             </label>
+
 
             <input
               id="clienteMaiorBobToBrl"
@@ -606,35 +827,40 @@
               placeholder="Ex: 2.220"
             >
 
-            <small>
-              Melhor condição para operações maiores.
-            </small>
 
           </div>
 
+
         </div>
+
 
 
 
         <!-- CAMBISTAS -->
 
         <h2>
-          Cambistas
+          Taxas para cambistas
         </h2>
 
 
         <div class="section-card">
 
+
           <div class="tier-label">
-            Taxa especial
+            TAXA ESPECIAL
           </div>
+
 
 
           <div class="rate-box">
 
+
             <label for="cambistaBrlToBob">
+
               🇧🇷 REAL → BOLIVIANO 🇧🇴
+
             </label>
+
 
             <input
               id="cambistaBrlToBob"
@@ -644,18 +870,20 @@
               placeholder="Ex: 2.210"
             >
 
-            <small>
-              Cotação exclusiva para usuários marcados como cambistas.
-            </small>
 
           </div>
 
 
+
           <div class="rate-box">
 
+
             <label for="cambistaBobToBrl">
-              🇧🇴 BOLIVIANO → REAL 🇧🇴
+
+              🇧🇴 BOLIVIANO → REAL 🇧🇷
+
             </label>
+
 
             <input
               id="cambistaBobToBrl"
@@ -665,20 +893,22 @@
               placeholder="Ex: 2.250"
             >
 
-            <small>
-              Cotação exclusiva para cambistas.
-            </small>
 
           </div>
+
 
         </div>
 
 
 
+
         <!-- SALVAR -->
 
+
         <button id="saveBtn">
+
           SALVAR TODAS AS COTAÇÕES
+
         </button>
 
 
@@ -689,41 +919,56 @@
 
 
 
+
         <!-- USUÁRIOS -->
 
+
         <h2>
+
           Usuários cadastrados
+
         </h2>
+
 
         <div id="usersList">
 
+
           <div class="status">
+
             Carregando usuários...
+
           </div>
+
 
         </div>
 
 
 
-        <!-- SAIR -->
 
         <button
           id="logoutBtn"
           class="secondary"
         >
+
           Sair
+
         </button>
+
 
         <div class="spacer"></div>
 
+
       </div>
 
+
     </div>
+
 
   </main>
 
 
   <script src="/admin.js"></script>
+
 
 </body>
 
