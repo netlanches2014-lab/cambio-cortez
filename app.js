@@ -4,8 +4,7 @@ const state = {
   user: null
 };
 
-const $ = (id) =>
-  document.getElementById(id);
+const $ = (id) => document.getElementById(id);
 
 
 // ======================================
@@ -13,22 +12,15 @@ const $ = (id) =>
 // ======================================
 
 function getUserToken() {
-  return localStorage.getItem(
-    "cambioCortezToken"
-  ) || "";
+  return localStorage.getItem("cambioCortezToken") || "";
 }
 
 function saveUserToken(token) {
-  localStorage.setItem(
-    "cambioCortezToken",
-    token
-  );
+  localStorage.setItem("cambioCortezToken", token);
 }
 
 function removeUserToken() {
-  localStorage.removeItem(
-    "cambioCortezToken"
-  );
+  localStorage.removeItem("cambioCortezToken");
 }
 
 
@@ -37,18 +29,12 @@ function removeUserToken() {
 // ======================================
 
 function setStatus(type, text) {
-
   const status = $("status");
 
-  if (!status) {
-    return;
-  }
+  if (!status) return;
 
-  status.className =
-    `status ${type}`;
-
-  status.textContent =
-    `● ${text}`;
+  status.className = `status ${type}`;
+  status.textContent = `● ${text}`;
 }
 
 
@@ -56,151 +42,41 @@ function setStatus(type, text) {
 // FORMATAR MOEDA
 // ======================================
 
-function formatCurrency(
-  value,
-  currency
-) {
-
-  if (!Number.isFinite(value)) {
-    return "—";
-  }
+function formatCurrency(value, currency) {
+  if (!Number.isFinite(value)) return "—";
 
   if (currency === "BRL") {
-
-    return new Intl.NumberFormat(
-      "pt-BR",
-      {
-        style: "currency",
-        currency: "BRL",
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      }
-    ).format(value);
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(value);
   }
 
   return (
-    value.toLocaleString(
-      "pt-BR",
-      {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      }
-    ) + " Bs"
+    value.toLocaleString("pt-BR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }) + " Bs"
   );
 }
 
 
 // ======================================
-// ERROS DO APP
+// ERROS
 // ======================================
 
 function showError(message) {
+  const box = $("errorMessage");
+  if (!box) return;
 
-  const errorBox =
-    $("errorMessage");
-
-  if (!errorBox) {
-    return;
-  }
-
-  errorBox.textContent =
-    message;
-
-  errorBox.classList.remove(
-    "hidden"
-  );
+  box.textContent = message;
+  box.classList.remove("hidden");
 }
 
 function hideError() {
-
-  const errorBox =
-    $("errorMessage");
-
-  if (!errorBox) {
-    return;
-  }
-
-  errorBox.classList.add(
-    "hidden"
-  );
-}
-
-
-// ======================================
-// MENSAGEM DO LOGIN
-// ======================================
-
-function showAuthMessage(
-  message,
-  isError = true
-) {
-
-  const box =
-    $("authMessage");
-
-  if (!box) {
-    return;
-  }
-
-  box.textContent =
-    message;
-
-  box.classList.remove(
-    "hidden"
-  );
-
-  box.style.color =
-    isError
-      ? "#f77485"
-      : "#67d99a";
-}
-
-function hideAuthMessage() {
-
-  const box =
-    $("authMessage");
-
-  if (!box) {
-    return;
-  }
-
-  box.textContent = "";
-
-  box.classList.add(
-    "hidden"
-  );
-}
-
-
-// ======================================
-// MOSTRAR APP
-// ======================================
-
-function showApp() {
-
-  $("accessScreen")
-    ?.classList
-    .add("hidden");
-
-  $("app")
-    ?.classList
-    .remove("hidden");
-}
-
-
-// ======================================
-// MOSTRAR LOGIN
-// ======================================
-
-function showLogin() {
-
-  $("app")
-    ?.classList
-    .add("hidden");
-
-  $("accessScreen")
-    ?.classList
-    .remove("hidden");
+  $("errorMessage")?.classList.add("hidden");
 }
 
 
@@ -208,111 +84,99 @@ function showLogin() {
 // LOGIN
 // ======================================
 
-async function loginUser() {
+function showAuthMessage(message, isError = true) {
+  const box = $("authMessage");
+  if (!box) return;
 
+  box.textContent = message;
+  box.classList.remove("hidden");
+  box.style.color = isError ? "#f77485" : "#67d99a";
+}
+
+function hideAuthMessage() {
+  const box = $("authMessage");
+  if (!box) return;
+
+  box.textContent = "";
+  box.classList.add("hidden");
+}
+
+function showApp() {
+  $("accessScreen")?.classList.add("hidden");
+  $("app")?.classList.remove("hidden");
+}
+
+function showLogin() {
+  $("app")?.classList.add("hidden");
+  $("accessScreen")?.classList.remove("hidden");
+}
+
+
+// ======================================
+// ENTRAR
+// ======================================
+
+async function loginUser() {
   hideAuthMessage();
 
-  const email =
-    String(
-      $("authEmail")?.value || ""
-    )
-      .trim()
-      .toLowerCase();
+  const email = String($("authEmail")?.value || "")
+    .trim()
+    .toLowerCase();
 
-  const password =
-    String(
-      $("authPassword")?.value || ""
-    );
+  const password = String($("authPassword")?.value || "");
 
   if (!email) {
-    showAuthMessage(
-      "Digite seu e-mail."
-    );
+    showAuthMessage("Digite seu e-mail.");
     return;
   }
 
   if (!password) {
-    showAuthMessage(
-      "Digite sua senha."
-    );
+    showAuthMessage("Digite sua senha.");
     return;
   }
 
-  const button =
-    $("loginUserButton");
+  const button = $("loginUserButton");
 
   if (button) {
     button.disabled = true;
-    button.textContent =
-      "ENTRANDO...";
+    button.textContent = "ENTRANDO...";
   }
 
   try {
+    const response = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email,
+        password
+      })
+    });
 
-    const response =
-      await fetch(
-        "/api/auth/login",
-        {
-          method: "POST",
+    const data = await response.json();
 
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
-
-          body:
-            JSON.stringify({
-              email,
-              password
-            })
-        }
-      );
-
-    const data =
-      await response.json();
-
-    if (
-      !response.ok ||
-      !data.ok
-    ) {
-
-      throw new Error(
-        data.error ||
-        "Não foi possível entrar."
-      );
+    if (!response.ok || !data.ok) {
+      throw new Error(data.error || "Não foi possível entrar.");
     }
 
     if (!data.accessToken) {
-
-      throw new Error(
-        "Sessão não recebida."
-      );
+      throw new Error("Sessão não recebida.");
     }
 
-    saveUserToken(
-      data.accessToken
-    );
-
-    state.user =
-      data.user || null;
+    saveUserToken(data.accessToken);
+    state.user = data.user || null;
 
     showApp();
-
     await loadQuotes();
 
   } catch (error) {
-
-    showAuthMessage(
-      error.message ||
-      "Erro ao entrar."
-    );
+    showAuthMessage(error.message || "Erro ao entrar.");
 
   } finally {
-
     if (button) {
       button.disabled = false;
-      button.textContent =
-        "ENTRAR";
+      button.textContent = "ENTRAR";
     }
   }
 }
@@ -323,145 +187,82 @@ async function loginUser() {
 // ======================================
 
 async function signupUser() {
-
   hideAuthMessage();
 
-  const nome =
-    String(
-      $("authName")?.value || ""
-    ).trim();
+  const nome = String($("authName")?.value || "").trim();
 
-  const email =
-    String(
-      $("authEmail")?.value || ""
-    )
-      .trim()
-      .toLowerCase();
+  const email = String($("authEmail")?.value || "")
+    .trim()
+    .toLowerCase();
 
-  const password =
-    String(
-      $("authPassword")?.value || ""
-    );
+  const password = String($("authPassword")?.value || "");
 
   if (nome.length < 2) {
-
-    showAuthMessage(
-      "Digite seu nome."
-    );
-
+    showAuthMessage("Digite seu nome.");
     return;
   }
 
-  if (
-    !email ||
-    !email.includes("@")
-  ) {
-
-    showAuthMessage(
-      "Digite um e-mail válido."
-    );
-
+  if (!email || !email.includes("@")) {
+    showAuthMessage("Digite um e-mail válido.");
     return;
   }
 
   if (password.length < 6) {
-
-    showAuthMessage(
-      "A senha precisa ter pelo menos 6 caracteres."
-    );
-
+    showAuthMessage("A senha precisa ter pelo menos 6 caracteres.");
     return;
   }
 
-  const button =
-    $("signupUserButton");
+  const button = $("signupUserButton");
 
   if (button) {
     button.disabled = true;
-    button.textContent =
-      "CRIANDO...";
+    button.textContent = "CRIANDO...";
   }
 
   try {
+    const response = await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        nome,
+        email,
+        password
+      })
+    });
 
-    const response =
-      await fetch(
-        "/api/auth/signup",
-        {
-          method: "POST",
+    const data = await response.json();
 
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
-
-          body:
-            JSON.stringify({
-              nome,
-              email,
-              password
-            })
-        }
-      );
-
-    const data =
-      await response.json();
-
-    if (
-      !response.ok ||
-      !data.ok
-    ) {
-
+    if (!response.ok || !data.ok) {
       throw new Error(
-        data.error ||
-        "Não foi possível criar o cadastro."
+        data.error || "Não foi possível criar o cadastro."
       );
     }
 
-    /*
-      Depois do cadastro,
-      fazemos login automaticamente.
-    */
+    const loginResponse = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email,
+        password
+      })
+    });
 
-    const loginResponse =
-      await fetch(
-        "/api/auth/login",
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
-
-          body:
-            JSON.stringify({
-              email,
-              password
-            })
-        }
-      );
-
-    const loginData =
-      await loginResponse.json();
+    const loginData = await loginResponse.json();
 
     if (
       loginResponse.ok &&
       loginData.ok &&
       loginData.accessToken
     ) {
-
-      saveUserToken(
-        loginData.accessToken
-      );
-
-      state.user =
-        loginData.user || null;
+      saveUserToken(loginData.accessToken);
+      state.user = loginData.user || null;
 
       showApp();
-
       await loadQuotes();
-
       return;
     }
 
@@ -471,31 +272,25 @@ async function signupUser() {
     );
 
   } catch (error) {
-
     showAuthMessage(
-      error.message ||
-      "Erro ao criar cadastro."
+      error.message || "Erro ao criar cadastro."
     );
 
   } finally {
-
     if (button) {
       button.disabled = false;
-      button.textContent =
-        "CRIAR CADASTRO";
+      button.textContent = "CRIAR CADASTRO";
     }
   }
 }
 
 
 // ======================================
-// VERIFICAR SESSÃO SALVA
+// RESTAURAR SESSÃO
 // ======================================
 
 async function restoreSession() {
-
-  const token =
-    getUserToken();
+  const token = getUserToken();
 
   if (!token) {
     showLogin();
@@ -503,44 +298,26 @@ async function restoreSession() {
   }
 
   try {
+    const response = await fetch("/api/auth/me", {
+      headers: {
+        Authorization: "Bearer " + token
+      }
+    });
 
-    const response =
-      await fetch(
-        "/api/auth/me",
-        {
-          headers: {
-            Authorization:
-              "Bearer " + token
-          }
-        }
-      );
+    const data = await response.json();
 
-    const data =
-      await response.json();
-
-    if (
-      !response.ok ||
-      !data.ok
-    ) {
-
-      throw new Error(
-        "Sessão inválida."
-      );
+    if (!response.ok || !data.ok) {
+      throw new Error("Sessão inválida.");
     }
 
-    state.user =
-      data.user || null;
+    state.user = data.user || null;
 
     showApp();
-
     await loadQuotes();
 
   } catch (error) {
-
     removeUserToken();
-
     state.user = null;
-
     showLogin();
   }
 }
@@ -551,30 +328,18 @@ async function restoreSession() {
 // ======================================
 
 async function loadQuotes() {
+  const refreshButton = $("refreshButton");
 
-  const refreshButton =
-    $("refreshButton");
+  refreshButton?.classList.add("rotating");
 
-  refreshButton
-    ?.classList
-    .add("rotating");
-
-  setStatus(
-    "loading",
-    "Atualizando"
-  );
-
+  setStatus("loading", "Atualizando");
   hideError();
 
   try {
-
-    const token =
-      getUserToken();
+    const token = getUserToken();
 
     if (!token) {
-
       removeUserToken();
-
       showLogin();
 
       throw new Error(
@@ -582,28 +347,18 @@ async function loadQuotes() {
       );
     }
 
-    const response =
-      await fetch(
-        "/api/user/quotes",
-        {
-          cache: "no-store",
+    const response = await fetch("/api/user/quotes", {
+      cache: "no-store",
+      headers: {
+        Authorization: "Bearer " + token
+      }
+    });
 
-          headers: {
-            Authorization:
-              "Bearer " + token
-          }
-        }
-      );
-
-    const data =
-      await response.json();
+    const data = await response.json();
 
     if (response.status === 401) {
-
       removeUserToken();
-
       state.user = null;
-
       showLogin();
 
       throw new Error(
@@ -611,80 +366,50 @@ async function loadQuotes() {
       );
     }
 
-    if (
-      !response.ok ||
-      !data.ok
-    ) {
-
+    if (!response.ok || !data.ok) {
       throw new Error(
-        data.error ||
-        "Não foi possível carregar as cotações."
+        data.error || "Não foi possível carregar as cotações."
       );
     }
 
-    state.data =
-      data;
+    state.data = data;
 
     renderQuotes();
 
-    const tipo =
-      String(
-        data.tipo || "cliente"
-      )
-        .toUpperCase();
+    const tipo = String(data.tipo || "cliente").toUpperCase();
 
-    setStatus(
-      "online",
-      `Online • ${tipo}`
-    );
+    setStatus("online", `Online • ${tipo}`);
 
   } catch (error) {
-
-    setStatus(
-      "error",
-      "Indisponível"
-    );
+    setStatus("error", "Indisponível");
 
     showError(
       "Não foi possível carregar as cotações. " +
-      (
-        error.message || ""
-      )
+      (error.message || "")
     );
 
   } finally {
-
-    refreshButton
-      ?.classList
-      .remove("rotating");
+    refreshButton?.classList.remove("rotating");
   }
 }
 
 
 // ======================================
-// OBTER TAXAS
+// TAXAS
 // ======================================
 
 function getRates() {
-
-  if (
-    !state.data ||
-    !state.data.quote
-  ) {
+  if (!state.data || !state.data.quote) {
     return null;
   }
 
-  const brlToBob =
-    Number(
-      state.data.quote
-        .brl_to_bob
-    );
+  const brlToBob = Number(
+    state.data.quote.brl_to_bob
+  );
 
-  const bobToBrl =
-    Number(
-      state.data.quote
-        .bob_to_brl
-    );
+  const bobToBrl = Number(
+    state.data.quote.bob_to_brl
+  );
 
   if (
     !Number.isFinite(brlToBob) ||
@@ -693,101 +418,95 @@ function getRates() {
     return null;
   }
 
+  const isCambista =
+    String(state.data.tipo || "cliente") === "cambista";
+
   return {
     brlToBob,
-    bobToBrl
+    bobToBrl,
+    isCambista,
+
+    lowBrlToBob: Number(
+      state.data.quote.cliente_menor_brl_to_bob ?? brlToBob
+    ),
+
+    lowBobToBrl: Number(
+      state.data.quote.cliente_menor_bob_to_brl ?? bobToBrl
+    ),
+
+    highBrlToBob: Number(
+      state.data.quote.cliente_maior_brl_to_bob ?? brlToBob
+    ),
+
+    highBobToBrl: Number(
+      state.data.quote.cliente_maior_bob_to_brl ?? bobToBrl
+    )
   };
 }
 
 
 // ======================================
-// EXIBIR COTAÇÕES
+// MOSTRAR COTAÇÕES
 // ======================================
 
 function renderQuotes() {
+  const rates = getRates();
 
-  const rates =
-    getRates();
+  if (!rates) return;
 
-  if (!rates) {
-    return;
+  if ($("crossBuy")) {
+    $("crossBuy").textContent =
+      `1 REAL = ${rates.brlToBob.toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 3
+      })} Bs`;
   }
 
-  const {
-    brlToBob,
-    bobToBrl
-  } = rates;
-
-  const crossBuy =
-    $("crossBuy");
-
-  const crossSell =
-    $("crossSell");
-
-  if (crossBuy) {
-
-    crossBuy.textContent =
-      `1 REAL = ${brlToBob.toLocaleString(
-        "pt-BR",
-        {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 3
-        }
-      )} Bs`;
+  if ($("crossSell")) {
+    $("crossSell").textContent =
+      `${rates.bobToBrl.toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 3
+      })} Bs = 1 REAL`;
   }
 
-  if (crossSell) {
-
-    crossSell.textContent =
-      `${bobToBrl.toLocaleString(
-        "pt-BR",
-        {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 3
-        }
-      )} Bs = 1 REAL`;
-  }
-
-
-  const updated =
-    state.data.updatedAt
-      ? new Date(
-          state.data.updatedAt
-        )
-      : null;
+  const updated = state.data.updatedAt
+    ? new Date(state.data.updatedAt)
+    : null;
 
   if (
     updated &&
-    !Number.isNaN(
-      updated.getTime()
-    )
+    !Number.isNaN(updated.getTime()) &&
+    $("updatedAt")
   ) {
-
-    const updatedAt =
-      $("updatedAt");
-
-    if (updatedAt) {
-
-      updatedAt.textContent =
-        "Última atualização: " +
-        updated.toLocaleString(
-          "pt-BR"
-        );
-    }
+    $("updatedAt").textContent =
+      "Última atualização: " +
+      updated.toLocaleString("pt-BR");
   }
 
-
-  const methodology =
-    $("methodology");
-
-  if (methodology) {
-
-    methodology.textContent =
+  if ($("methodology")) {
+    $("methodology").textContent =
       state.data.methodology ||
-      "Cotação manual • Câmbio Cortez";
+      "Cotação manual • Cortez & Sarmento Câmbios";
   }
 
   convertCurrency();
+}
+
+
+// ======================================
+// AVISO DE VOLUME
+// ======================================
+
+function setVolumeMessage(html) {
+  const box =
+    $("volumeMessage") ||
+    $("volumeRateNotice") ||
+    $("volumeBenefit");
+
+  if (box) {
+    box.innerHTML = html;
+  }
 }
 
 
@@ -796,36 +515,65 @@ function renderQuotes() {
 // ======================================
 
 function convertCurrency() {
+  const rates = getRates();
 
-  const rates =
-    getRates();
+  if (!rates) return null;
 
-  if (!rates) {
-    return null;
-  }
+  const amount = Number($("amount")?.value);
 
-  const amount =
-    Number(
-      $("amount")?.value
-    );
+  const fromCurrency = $("fromCurrency")?.value;
+  const toCurrency = $("toCurrency")?.value;
 
-  const fromCurrency =
-    $("fromCurrency")?.value;
-
-  const toCurrency =
-    $("toCurrency")?.value;
-
-  if (
-    !Number.isFinite(amount) ||
-    amount < 0
-  ) {
-
+  if (!Number.isFinite(amount) || amount < 0) {
     if ($("conversionResult")) {
-      $("conversionResult")
-        .textContent = "—";
+      $("conversionResult").textContent = "—";
     }
 
     return null;
+  }
+
+  let activeBrlToBob = rates.brlToBob;
+  let activeBobToBrl = rates.bobToBrl;
+
+  let brlEquivalent = amount;
+
+  if (!rates.isCambista) {
+    if (fromCurrency === "BOB") {
+      brlEquivalent =
+        amount / rates.lowBobToBrl;
+    }
+
+    const betterTier =
+      brlEquivalent >= 1000;
+
+    activeBrlToBob = betterTier
+      ? rates.highBrlToBob
+      : rates.lowBrlToBob;
+
+    activeBobToBrl = betterTier
+      ? rates.highBobToBrl
+      : rates.lowBobToBrl;
+
+    if (betterTier) {
+      setVolumeMessage(
+        "⭐ <strong>Melhor cotação por volume aplicada!</strong><br>Operações a partir de R$ 1.000 recebem uma condição especial."
+      );
+    } else {
+      const missing =
+        Math.max(0, 1000 - brlEquivalent);
+
+      setVolumeMessage(
+        `💰 Quanto maior o valor, melhor sua cotação.<br><strong>Faltam ${formatCurrency(
+          missing,
+          "BRL"
+        )} para liberar a melhor taxa.</strong>`
+      );
+    }
+
+  } else {
+    setVolumeMessage(
+      "⭐ <strong>Taxa especial de cambista aplicada.</strong>"
+    );
   }
 
   let result = null;
@@ -835,79 +583,51 @@ function convertCurrency() {
     fromCurrency === "BRL" &&
     toCurrency === "BOB"
   ) {
-
     result = {
-      value:
-        amount *
-        rates.brlToBob,
-
-      rate:
-        rates.brlToBob
+      value: amount * activeBrlToBob,
+      rate: activeBrlToBob
     };
 
     rateText =
-      `1 BRL = ${rates.brlToBob.toLocaleString(
-        "pt-BR",
-        {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 3
-        }
-      )} BOB`;
+      `1 BRL = ${activeBrlToBob.toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 3
+      })} BOB`;
 
   } else if (
     fromCurrency === "BOB" &&
     toCurrency === "BRL"
   ) {
-
     result = {
-      value:
-        amount /
-        rates.bobToBrl,
-
-      rate:
-        rates.bobToBrl
+      value: amount / activeBobToBrl,
+      rate: activeBobToBrl
     };
 
     rateText =
-      `${rates.bobToBrl.toLocaleString(
-        "pt-BR",
-        {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 3
-        }
-      )} BOB = 1 BRL`;
+      `${activeBobToBrl.toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 3
+      })} BOB = 1 BRL`;
 
   } else {
-
     result = {
       value: amount,
       rate: 1
     };
 
-    rateText =
-      "1 = 1";
+    rateText = "1 = 1";
   }
 
-
-  const resultBox =
-    $("conversionResult");
-
-  if (resultBox) {
-
-    resultBox.textContent =
+  if ($("conversionResult")) {
+    $("conversionResult").textContent =
       formatCurrency(
         result.value,
         toCurrency
       );
   }
 
-
-  const rateBox =
-    $("conversionRate");
-
-  if (rateBox) {
-
-    rateBox.textContent =
+  if ($("conversionRate")) {
+    $("conversionRate").textContent =
       rateText;
   }
 
@@ -920,25 +640,15 @@ function convertCurrency() {
 // ======================================
 
 function swapCurrencies() {
+  const from = $("fromCurrency");
+  const to = $("toCurrency");
 
-  const from =
-    $("fromCurrency");
+  if (!from || !to) return;
 
-  const to =
-    $("toCurrency");
+  const oldFrom = from.value;
 
-  if (!from || !to) {
-    return;
-  }
-
-  const oldFrom =
-    from.value;
-
-  from.value =
-    to.value;
-
-  to.value =
-    oldFrom;
+  from.value = to.value;
+  to.value = oldFrom;
 
   convertCurrency();
 }
@@ -949,100 +659,56 @@ function swapCurrencies() {
 // ======================================
 
 function openWhatsApp() {
+  const amount = Number($("amount")?.value);
 
-  const amount =
-    Number(
-      $("amount")?.value
-    );
+  const fromCurrency = $("fromCurrency")?.value;
 
-  const fromCurrency =
-    $("fromCurrency")?.value;
+  const result = convertCurrency();
 
-  const toCurrency =
-    $("toCurrency")?.value;
-
-  const result =
-    convertCurrency();
-
-  if (
-    !result ||
-    !Number.isFinite(amount)
-  ) {
-
-    alert(
-      "Digite um valor válido."
-    );
-
+  if (!result || !Number.isFinite(amount)) {
+    alert("Digite um valor válido.");
     return;
   }
 
   let valorReal;
   let valorBoliviano;
 
-  if (
-    fromCurrency === "BRL"
-  ) {
-
-    valorReal =
-      amount;
-
-    valorBoliviano =
-      result.value;
-
+  if (fromCurrency === "BRL") {
+    valorReal = amount;
+    valorBoliviano = result.value;
   } else {
-
-    valorBoliviano =
-      amount;
-
-    valorReal =
-      result.value;
+    valorBoliviano = amount;
+    valorReal = result.value;
   }
 
-
   const valorRealFormatado =
-    valorReal.toLocaleString(
-      "pt-BR",
-      {
-        style: "currency",
-        currency: "BRL"
-      }
-    );
-
+    valorReal.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
 
   const valorBolivianoFormatado =
-    valorBoliviano.toLocaleString(
-      "pt-BR",
-      {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      }
-    ) + " Bs";
-
+    valorBoliviano.toLocaleString("pt-BR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }) + " Bs";
 
   const operacao =
     fromCurrency === "BRL"
       ? "REAL → BOLIVIANO"
       : "BOLIVIANO → REAL";
 
-
-  const agora =
-    new Date();
-
   const dataHora =
-    agora.toLocaleString(
-      "pt-BR",
-      {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit"
-      }
-    );
-
+    new Date().toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
 
   const mensagem =
-`⚔️ CÂMBIO CORTEZ
+`⚔️ CORTEZ & SARMENTO CÂMBIOS
 
 📅 Data e horário:
 ${dataHora}
@@ -1062,17 +728,11 @@ ${valorBolivianoFormatado}
 ⏱ Validade da cotação:
 10 minutos`;
 
-
   const whatsappUrl =
     "https://wa.me/?text=" +
-    encodeURIComponent(
-      mensagem
-    );
+    encodeURIComponent(mensagem);
 
-  window.open(
-    whatsappUrl,
-    "_blank"
-  );
+  window.open(whatsappUrl, "_blank");
 }
 
 
@@ -1081,102 +741,62 @@ ${valorBolivianoFormatado}
 // ======================================
 
 async function copyQuote() {
+  const amount = Number($("amount")?.value);
 
-  const amount =
-    Number(
-      $("amount")?.value
-    );
+  const fromCurrency = $("fromCurrency")?.value;
 
-  const fromCurrency =
-    $("fromCurrency")?.value;
-
-  const toCurrency =
-    $("toCurrency")?.value;
-
-  const result =
-    convertCurrency();
+  const result = convertCurrency();
 
   if (
     !result ||
     !Number.isFinite(amount) ||
     amount <= 0
   ) {
-
     alert(
       "Digite um valor válido para copiar a cotação."
     );
-
     return;
   }
-
 
   let valorReal;
   let valorBoliviano;
 
-  if (
-    fromCurrency === "BRL"
-  ) {
-
-    valorReal =
-      amount;
-
-    valorBoliviano =
-      result.value;
-
+  if (fromCurrency === "BRL") {
+    valorReal = amount;
+    valorBoliviano = result.value;
   } else {
-
-    valorBoliviano =
-      amount;
-
-    valorReal =
-      result.value;
+    valorBoliviano = amount;
+    valorReal = result.value;
   }
 
-
   const valorRealFormatado =
-    valorReal.toLocaleString(
-      "pt-BR",
-      {
-        style: "currency",
-        currency: "BRL"
-      }
-    );
-
+    valorReal.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
 
   const valorBolivianoFormatado =
-    valorBoliviano.toLocaleString(
-      "pt-BR",
-      {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      }
-    ) + " Bs";
-
+    valorBoliviano.toLocaleString("pt-BR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }) + " Bs";
 
   const operacao =
     fromCurrency === "BRL"
       ? "REAL → BOLIVIANO"
       : "BOLIVIANO → REAL";
 
-
-  const agora =
-    new Date();
-
   const dataHora =
-    agora.toLocaleString(
-      "pt-BR",
-      {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit"
-      }
-    );
-
+    new Date().toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
 
   const mensagem =
-`⚔️ CÂMBIO CORTEZ
+`⚔️ CORTEZ & SARMENTO CÂMBIOS
 
 📅 Data e horário:
 ${dataHora}
@@ -1196,38 +816,23 @@ ${valorBolivianoFormatado}
 ⏱ Validade da cotação:
 10 minutos`;
 
-
   try {
+    await navigator.clipboard.writeText(mensagem);
 
-    await navigator
-      .clipboard
-      .writeText(
-        mensagem
-      );
+    const button = $("copyQuoteButton");
 
-    const botao =
-      $("copyQuoteButton");
+    if (!button) return;
 
-    if (!botao) {
-      return;
-    }
+    const original = button.innerHTML;
 
-    const textoOriginal =
-      botao.innerHTML;
-
-    botao.innerHTML =
+    button.innerHTML =
       "✓ COTAÇÃO COPIADA";
 
-    setTimeout(
-      () => {
-        botao.innerHTML =
-          textoOriginal;
-      },
-      2000
-    );
+    setTimeout(() => {
+      button.innerHTML = original;
+    }, 2000);
 
   } catch (error) {
-
     alert(
       "Não foi possível copiar a cotação."
     );
@@ -1236,89 +841,62 @@ ${valorBolivianoFormatado}
 
 
 // ======================================
-// EVENTOS LOGIN
+// EVENTOS
 // ======================================
 
-$("loginUserButton")
-  ?.addEventListener(
-    "click",
-    loginUser
-  );
+$("loginUserButton")?.addEventListener(
+  "click",
+  loginUser
+);
 
+$("signupUserButton")?.addEventListener(
+  "click",
+  signupUser
+);
 
-$("signupUserButton")
-  ?.addEventListener(
-    "click",
-    signupUser
-  );
-
-
-$("authPassword")
-  ?.addEventListener(
-    "keydown",
-    (event) => {
-
-      if (
-        event.key === "Enter"
-      ) {
-
-        loginUser();
-      }
+$("authPassword")?.addEventListener(
+  "keydown",
+  (event) => {
+    if (event.key === "Enter") {
+      loginUser();
     }
-  );
+  }
+);
 
+$("refreshButton")?.addEventListener(
+  "click",
+  loadQuotes
+);
 
-// ======================================
-// EVENTOS DO APP
-// ======================================
+$("amount")?.addEventListener(
+  "input",
+  convertCurrency
+);
 
-$("refreshButton")
-  ?.addEventListener(
-    "click",
-    loadQuotes
-  );
+$("fromCurrency")?.addEventListener(
+  "change",
+  convertCurrency
+);
 
+$("toCurrency")?.addEventListener(
+  "change",
+  convertCurrency
+);
 
-$("amount")
-  ?.addEventListener(
-    "input",
-    convertCurrency
-  );
+$("swapButton")?.addEventListener(
+  "click",
+  swapCurrencies
+);
 
+$("whatsappButton")?.addEventListener(
+  "click",
+  openWhatsApp
+);
 
-$("fromCurrency")
-  ?.addEventListener(
-    "change",
-    convertCurrency
-  );
-
-
-$("toCurrency")
-  ?.addEventListener(
-    "change",
-    convertCurrency
-  );
-
-
-$("swapButton")
-  ?.addEventListener(
-    "click",
-    swapCurrencies
-  );
-
-
-$("whatsappButton")
-  ?.addEventListener(
-    "click",
-    openWhatsApp
-  );
-
-
-$("copyQuoteButton")
-  ?.addEventListener(
-    "click",
-    copyQuote
-  );
+$("copyQuoteButton")?.addEventListener(
+  "click",
+  copyQuote
+);
 
 
 // ======================================
