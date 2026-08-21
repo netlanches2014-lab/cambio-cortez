@@ -91,7 +91,6 @@ async function login() {
 async function loadPanel() {
 
   await loadQuotes();
-
   await loadUsers();
 }
 
@@ -135,9 +134,10 @@ async function loadQuotes() {
 
     document
       .getElementById(
-        "clienteBrlToBob"
+        "clienteMenorBrlToBob"
       )
       .value =
+        quote.cliente_menor_brl_to_bob ??
         quote.cliente_brl_to_bob ??
         quote.brl_to_bob ??
         "";
@@ -145,9 +145,32 @@ async function loadQuotes() {
 
     document
       .getElementById(
-        "clienteBobToBrl"
+        "clienteMenorBobToBrl"
       )
       .value =
+        quote.cliente_menor_bob_to_brl ??
+        quote.cliente_bob_to_brl ??
+        quote.bob_to_brl ??
+        "";
+
+
+    document
+      .getElementById(
+        "clienteMaiorBrlToBob"
+      )
+      .value =
+        quote.cliente_maior_brl_to_bob ??
+        quote.cliente_brl_to_bob ??
+        quote.brl_to_bob ??
+        "";
+
+
+    document
+      .getElementById(
+        "clienteMaiorBobToBrl"
+      )
+      .value =
+        quote.cliente_maior_bob_to_brl ??
         quote.cliente_bob_to_brl ??
         quote.bob_to_brl ??
         "";
@@ -219,21 +242,41 @@ async function saveQuotes() {
 
   try {
 
-    const clienteBrlToBob =
+    const clienteMenorBrlToBob =
       Number(
         document
           .getElementById(
-            "clienteBrlToBob"
+            "clienteMenorBrlToBob"
           )
           .value
       );
 
 
-    const clienteBobToBrl =
+    const clienteMenorBobToBrl =
       Number(
         document
           .getElementById(
-            "clienteBobToBrl"
+            "clienteMenorBobToBrl"
+          )
+          .value
+      );
+
+
+    const clienteMaiorBrlToBob =
+      Number(
+        document
+          .getElementById(
+            "clienteMaiorBrlToBob"
+          )
+          .value
+      );
+
+
+    const clienteMaiorBobToBrl =
+      Number(
+        document
+          .getElementById(
+            "clienteMaiorBobToBrl"
           )
           .value
       );
@@ -260,38 +303,49 @@ async function saveQuotes() {
 
 
     if (
-      !Number.isFinite(
-        clienteBrlToBob
-      ) ||
-      clienteBrlToBob <= 0
+      !Number.isFinite(clienteMenorBrlToBob) ||
+      clienteMenorBrlToBob <= 0
     ) {
-
       throw new Error(
-        "Digite uma taxa válida de CLIENTE para REAL → BOLIVIANO."
+        "Digite uma taxa válida para cliente abaixo de R$ 1.000 em REAL → BOLIVIANO."
       );
     }
 
 
     if (
-      !Number.isFinite(
-        clienteBobToBrl
-      ) ||
-      clienteBobToBrl <= 0
+      !Number.isFinite(clienteMenorBobToBrl) ||
+      clienteMenorBobToBrl <= 0
     ) {
-
       throw new Error(
-        "Digite uma taxa válida de CLIENTE para BOLIVIANO → REAL."
+        "Digite uma taxa válida para cliente abaixo de R$ 1.000 em BOLIVIANO → REAL."
       );
     }
 
 
     if (
-      !Number.isFinite(
-        cambistaBrlToBob
-      ) ||
+      !Number.isFinite(clienteMaiorBrlToBob) ||
+      clienteMaiorBrlToBob <= 0
+    ) {
+      throw new Error(
+        "Digite uma taxa válida para cliente a partir de R$ 1.000 em REAL → BOLIVIANO."
+      );
+    }
+
+
+    if (
+      !Number.isFinite(clienteMaiorBobToBrl) ||
+      clienteMaiorBobToBrl <= 0
+    ) {
+      throw new Error(
+        "Digite uma taxa válida para cliente a partir de R$ 1.000 em BOLIVIANO → REAL."
+      );
+    }
+
+
+    if (
+      !Number.isFinite(cambistaBrlToBob) ||
       cambistaBrlToBob <= 0
     ) {
-
       throw new Error(
         "Digite uma taxa válida de CAMBISTA para REAL → BOLIVIANO."
       );
@@ -299,12 +353,9 @@ async function saveQuotes() {
 
 
     if (
-      !Number.isFinite(
-        cambistaBobToBrl
-      ) ||
+      !Number.isFinite(cambistaBobToBrl) ||
       cambistaBobToBrl <= 0
     ) {
-
       throw new Error(
         "Digite uma taxa válida de CAMBISTA para BOLIVIANO → REAL."
       );
@@ -327,8 +378,10 @@ async function saveQuotes() {
 
           body:
             JSON.stringify({
-              clienteBrlToBob,
-              clienteBobToBrl,
+              clienteMenorBrlToBob,
+              clienteMenorBobToBrl,
+              clienteMaiorBrlToBob,
+              clienteMaiorBobToBrl,
               cambistaBrlToBob,
               cambistaBobToBrl
             })
@@ -353,7 +406,7 @@ async function saveQuotes() {
 
 
     adminMsg.textContent =
-      "✅ Cotações atualizadas com sucesso.";
+      "✅ Todas as cotações foram atualizadas com sucesso.";
 
   } catch (error) {
 
@@ -613,40 +666,23 @@ async function changeUserType(
 
 
 // ======================================
-// PROTEÇÃO PARA TEXTO HTML
+// PROTEÇÃO DE TEXTO HTML
 // ======================================
 
 function escapeHtml(value) {
 
-  return String(value)
-    .replaceAll(
-      "&",
-      "&amp;"
-    )
-    .replaceAll(
-      "<",
-      "&lt;"
-    )
-    .replaceAll(
-      ">",
-      "&gt;"
-    )
-    .replaceAll(
-      '"',
-      "&quot;"
-    )
-    .replaceAll(
-      "'",
-      "&#039;"
-    );
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
 
 function escapeAttribute(value) {
 
-  return escapeHtml(
-    String(value)
-  );
+  return escapeHtml(value);
 }
 
 
@@ -658,69 +694,66 @@ async function logout() {
 
   try {
 
-    await fetch(
-      "/api/admin/logout",
-      {
-        method: "POST",
+    if (token) {
 
-        headers: {
-          Authorization:
-            "Bearer " + token
+      await fetch(
+        "/api/admin/logout",
+        {
+          method: "POST",
+
+          headers: {
+            Authorization:
+              "Bearer " + token
+          }
         }
-      }
-    );
+      );
+    }
 
   } catch (error) {
 
     console.error(error);
+
+  } finally {
+
+    sessionStorage.removeItem(
+      "adminToken"
+    );
+
+    token = "";
+
+    adminBox.classList.add(
+      "hidden"
+    );
+
+    loginBox.classList.remove(
+      "hidden"
+    );
+
+    document
+      .getElementById("password")
+      .value = "";
+
+    loginMsg.textContent = "";
+    adminMsg.textContent = "";
   }
-
-
-  sessionStorage.removeItem(
-    "adminToken"
-  );
-
-  token = "";
-
-  location.reload();
 }
 
 
 // ======================================
-// BOTÕES
+// EVENTOS
 // ======================================
 
 document
   .getElementById("loginBtn")
-  .addEventListener(
+  ?.addEventListener(
     "click",
     login
   );
 
 
 document
-  .getElementById("saveBtn")
-  .addEventListener(
-    "click",
-    saveQuotes
-  );
-
-
-document
-  .getElementById("logoutBtn")
-  .addEventListener(
-    "click",
-    logout
-  );
-
-
-// ======================================
-// ENTER NA SENHA
-// ======================================
-
-document
   .getElementById("password")
-  .addEventListener(
+  ?.addEventListener(
     "keydown",
     (event) => {
 
@@ -734,11 +767,26 @@ document
   );
 
 
+document
+  .getElementById("saveBtn")
+  ?.addEventListener(
+    "click",
+    saveQuotes
+  );
+
+
+document
+  .getElementById("logoutBtn")
+  ?.addEventListener(
+    "click",
+    logout
+  );
+
+
 // ======================================
-// ABRIR PAINEL SE JÁ ESTIVER LOGADO
+// RESTAURAR SESSÃO ADMIN
 // ======================================
 
 if (token) {
-
   loadPanel();
 }
