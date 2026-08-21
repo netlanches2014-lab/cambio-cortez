@@ -13,20 +13,19 @@
 
   <meta
     name="description"
-    content="Cortez & Sarmento Câmbios — cotação direta entre Real e Boliviano."
+    content="Cortez e Sarmentos Câmbios — conversão entre Real e Boliviano."
   >
 
-  <title>Cortez & Sarmento Câmbios</title>
+  <title>Cortez e Sarmentos Câmbios</title>
 
-  <!-- PRÉVIA DO LINK NO WHATSAPP / REDES -->
   <meta
     property="og:title"
-    content="Cortez & Sarmento Câmbios"
+    content="Cortez e Sarmentos Câmbios"
   >
 
   <meta
     property="og:description"
-    content="Cotação direta e confiável entre Real e Boliviano."
+    content="Cotação direta entre Real e Boliviano."
   >
 
   <meta property="og:type" content="website">
@@ -38,39 +37,136 @@
 
   <meta
     property="og:image"
-    content="https://cambio-cortez.onrender.com/preview-cambio-cortez.png"
-  >
-
-  <meta
-    property="og:image:alt"
-    content="Cortez & Sarmento Câmbios"
-  >
-
-  <meta
-    name="twitter:card"
-    content="summary_large_image"
+    content="https://cambio-cortez.onrender.com/logo-cortez-sarmentos.png"
   >
 
   <link rel="stylesheet" href="/styles.css">
+
+  <style>
+
+    .brand-logo {
+      width: 74px;
+      height: 74px;
+      object-fit: contain;
+      border-radius: 18px;
+    }
+
+    .login-logo {
+      display: block;
+      width: 210px;
+      max-width: 80%;
+      height: auto;
+      object-fit: contain;
+      margin: 0 auto 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .volume-info {
+      margin: 0 30px 16px;
+
+      padding: 18px;
+
+      border: 1px solid rgba(245, 196, 81, 0.35);
+      border-radius: 20px;
+
+      background:
+        linear-gradient(
+          180deg,
+          rgba(245, 196, 81, 0.07),
+          rgba(245, 196, 81, 0.02)
+        );
+    }
+
+    .volume-info strong {
+      display: block;
+
+      color: #ffffff;
+
+      font-size: 18px;
+
+      line-height: 1.4;
+
+      margin-bottom: 5px;
+    }
+
+    .volume-info small {
+      color: #b5b5b5;
+
+      font-size: 14px;
+
+      line-height: 1.5;
+    }
+
+    .volume-message {
+      margin-top: 18px;
+
+      padding: 15px;
+
+      border-radius: 15px;
+
+      background:
+        rgba(245, 196, 81, 0.08);
+
+      border:
+        1px solid rgba(245, 196, 81, 0.28);
+
+      color: #f6d981;
+
+      line-height: 1.5;
+
+      font-size: 14px;
+    }
+
+    @media (max-width: 600px) {
+
+      .brand-logo {
+        width: 64px;
+        height: 64px;
+      }
+
+      .volume-info {
+        margin-left: 20px;
+        margin-right: 20px;
+      }
+
+    }
+
+  </style>
+
 </head>
+
 
 <body>
 
-  <!-- LOGIN / CADASTRO -->
-  <section id="accessScreen" class="access-screen">
+
+  <!-- =================================
+       LOGIN / CADASTRO
+  ================================== -->
+
+  <section
+    id="accessScreen"
+    class="access-screen"
+  >
 
     <div class="access-card">
 
-      <div class="spartan-logo">
-        ⚔️
-      </div>
+      <img
+        src="/logo-cortez-sarmentos.png"
+        alt="Cortez e Sarmentos Câmbios"
+        class="login-logo"
+      >
 
       <p class="eyebrow">
         COTAÇÃO DIRETA
       </p>
 
       <h1>
-        CORTEZ & SARMENTO
+        CORTEZ E SARMENTOS
         <span>CÂMBIOS</span>
       </h1>
 
@@ -78,6 +174,7 @@
         Entre na sua conta ou faça seu cadastro
         para acessar suas cotações.
       </p>
+
 
       <div id="authForms">
 
@@ -102,12 +199,14 @@
           autocomplete="current-password"
         >
 
+
         <button
           id="loginUserButton"
           class="gold-button"
         >
           ENTRAR
         </button>
+
 
         <button
           id="signupUserButton"
@@ -116,12 +215,14 @@
           CRIAR CADASTRO
         </button>
 
+
         <div
           id="authMessage"
           class="error-message hidden"
         ></div>
 
       </div>
+
 
       <small>
         Todo novo cadastro entra automaticamente como cliente.
@@ -132,34 +233,61 @@
   </section>
 
 
-  <!-- APLICAÇÃO -->
-  <main id="app" class="app hidden">
+
+  <!-- =================================
+       APLICAÇÃO
+  ================================== -->
+
+  <main
+    id="app"
+    class="app hidden"
+  >
+
+
+    <!-- TOPO -->
 
     <header class="topbar">
 
       <div class="brand">
 
-        <div class="mini-logo">
-          ⚔️
-        </div>
+        <img
+          src="/logo-cortez-sarmentos.png"
+          alt="Cortez e Sarmentos Câmbios"
+          class="brand-logo"
+        >
 
         <div>
-          <strong>Cortez & Sarmento Câmbios</strong>
-          <span>Mercado P2P</span>
+
+          <strong>
+            Cortez e Sarmentos Câmbios
+          </strong>
+
+          <span>
+            Mercado P2P
+          </span>
+
         </div>
 
       </div>
 
-      <div id="status" class="status loading">
+
+      <div
+        id="status"
+        class="status loading"
+      >
         ● Conectando
       </div>
 
     </header>
 
 
+
+    <!-- TÍTULO -->
+
     <section class="hero">
 
       <div>
+
         <p class="eyebrow">
           PAINEL AO VIVO
         </p>
@@ -167,7 +295,9 @@
         <h2>
           Cotações ao vivo
         </h2>
+
       </div>
+
 
       <button
         id="refreshButton"
@@ -180,26 +310,36 @@
     </section>
 
 
-    <!-- AVISO DE COTAÇÃO POR VOLUME -->
+
+    <!-- COTAÇÃO POR VOLUME -->
+
     <section class="volume-info">
+
       <p class="eyebrow">
         COTAÇÃO POR VOLUME
       </p>
 
       <strong>
-        💰 Quanto maior o valor, melhor sua cotação
+        💰 Quanto maior o valor,
+        melhor sua cotação
       </strong>
 
       <small>
-        Operações a partir de R$ 1.000 recebem uma condição especial.
+        Operações a partir de R$ 1.000
+        recebem uma condição especial.
       </small>
+
     </section>
 
 
+
     <!-- COTAÇÕES -->
+
     <section class="cards">
 
+
       <article class="quote-card cross-card">
+
 
         <div class="card-title">
 
@@ -207,30 +347,45 @@
             🇧🇷 ⇄ 🇧🇴
           </span>
 
+
           <div>
+
             <strong>
               REAL ↔ BOLIVIANO
             </strong>
 
             <small>
-              Sua cotação é aplicada automaticamente
+              Sua cotação é aplicada
+              automaticamente
             </small>
+
           </div>
 
         </div>
 
 
+
         <div class="quote-grid">
+
 
           <div>
 
             <small>
-              <b>VENDA DE REAL</b>
+
+              <b>
+                VENDA DE REAL
+              </b>
+
               <br>
+
               🇧🇷 Você vende REAL
+
               <br>
+
               → recebe BOLIVIANO 🇧🇴
+
             </small>
+
 
             <strong id="crossBuy">
               —
@@ -239,21 +394,32 @@
           </div>
 
 
+
           <div>
 
             <small>
-              <b>VENDA DE BOLIVIANO</b>
+
+              <b>
+                VENDA DE BOLIVIANO
+              </b>
+
               <br>
+
               🇧🇴 Você vende BOLIVIANO
+
               <br>
+
               → recebe REAL 🇧🇷
+
             </small>
+
 
             <strong id="crossSell">
               —
             </strong>
 
           </div>
+
 
         </div>
 
@@ -262,7 +428,11 @@
     </section>
 
 
-    <!-- CALCULADORA -->
+
+    <!-- =================================
+         CONVERSOR
+    ================================== -->
+
     <section class="converter">
 
       <p class="eyebrow">
@@ -273,9 +443,11 @@
         Conversor
       </h3>
 
+
       <label for="amount">
         Valor
       </label>
+
 
       <div class="input-row">
 
@@ -288,12 +460,21 @@
           value="100"
         >
 
+
         <select id="fromCurrency">
-          <option value="BRL">BRL</option>
-          <option value="BOB">BOB</option>
+
+          <option value="BRL">
+            BRL
+          </option>
+
+          <option value="BOB">
+            BOB
+          </option>
+
         </select>
 
       </div>
+
 
 
       <button
@@ -305,24 +486,42 @@
       </button>
 
 
+
       <label for="toCurrency">
         Converter para
       </label>
+
 
       <select
         id="toCurrency"
         class="full-select"
       >
-        <option value="BOB">BOB</option>
-        <option value="BRL">BRL</option>
+
+        <option value="BOB">
+          BOB
+        </option>
+
+        <option value="BRL">
+          BRL
+        </option>
+
       </select>
 
 
-      <!-- MENSAGEM PARA INCENTIVAR VALORES MAIORES -->
-      <div id="volumeMessage" class="volume-message">
-        💰 Quanto maior o valor, melhor sua cotação.
+
+      <!-- AVISO AUTOMÁTICO -->
+
+      <div
+        id="volumeMessage"
+        class="volume-message"
+      >
+        💰 Quanto maior o valor,
+        melhor sua cotação.
       </div>
 
+
+
+      <!-- RESULTADO -->
 
       <div class="result-box">
 
@@ -330,18 +529,22 @@
           RESULTADO DA OPERAÇÃO
         </small>
 
+
         <strong id="conversionResult">
           —
         </strong>
+
 
         <span id="conversionRate">
           Aguardando cotação
         </span>
 
+
         <div
           id="volumeBenefit"
           class="volume-benefit"
         ></div>
+
 
         <div class="result-validity">
           ⏱ Cotação válida por 10 minutos
@@ -350,12 +553,19 @@
       </div>
 
 
+
+      <!-- WHATSAPP -->
+
       <button
         id="whatsappButton"
         class="gold-button"
       >
         FINALIZAR PELO WHATSAPP
       </button>
+
+
+
+      <!-- COPIAR -->
 
       <button
         id="copyQuoteButton"
@@ -367,11 +577,15 @@
     </section>
 
 
+
     <div
       id="errorMessage"
       class="error-message hidden"
     ></div>
 
+
+
+    <!-- RODAPÉ -->
 
     <footer>
 
@@ -379,15 +593,18 @@
         Última atualização: —
       </div>
 
+
       <div id="quoteValidity">
         ⏱ Cotação válida por 10 minutos
       </div>
 
+
       <div id="methodology">
-        Cotação manual · Cortez & Sarmento Câmbios
+        Cortez e Sarmentos Câmbios
       </div>
 
     </footer>
+
 
   </main>
 
@@ -395,4 +612,5 @@
   <script src="/app.js"></script>
 
 </body>
+
 </html>
