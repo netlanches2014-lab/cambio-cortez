@@ -4,33 +4,24 @@ const path = require("path");
 const crypto = require("crypto");
 
 const app = express();
-
 const PORT = process.env.PORT || 10000;
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
-
 const SUPABASE_SERVICE_ROLE_KEY =
   process.env.SUPABASE_SERVICE_ROLE_KEY;
-
 const SUPABASE_PUBLISHABLE_KEY =
   process.env.SUPABASE_PUBLISHABLE_KEY;
-
-const ADMIN_PASSWORD =
-  process.env.ADMIN_PASSWORD;
-
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 // ======================================
 // SESSÃO ADMIN
 // ======================================
 
 const adminSessions = new Map();
-
-const ADMIN_SESSION_TTL =
-  24 * 60 * 60 * 1000;
-
+const ADMIN_SESSION_TTL = 24 * 60 * 60 * 1000;
 
 // ======================================
-// CONFIGURAÇÃO EXPRESS
+// EXPRESS
 // ======================================
 
 app.disable("x-powered-by");
@@ -47,21 +38,15 @@ app.use(
   })
 );
 
-app.use(
-  express.static(__dirname)
-);
-
+app.use(express.static(__dirname));
 
 // ======================================
-// VERIFICAR VARIÁVEIS
+// VARIÁVEIS
 // ======================================
 
 function checkEnv() {
-
   if (!SUPABASE_URL) {
-    throw new Error(
-      "SUPABASE_URL não configurada."
-    );
+    throw new Error("SUPABASE_URL não configurada.");
   }
 
   if (!SUPABASE_SERVICE_ROLE_KEY) {
@@ -77,25 +62,18 @@ function checkEnv() {
   }
 
   if (!ADMIN_PASSWORD) {
-    throw new Error(
-      "ADMIN_PASSWORD não configurada."
-    );
+    throw new Error("ADMIN_PASSWORD não configurada.");
   }
 }
 
-
 // ======================================
-// RESPOSTA JSON SEGURA
+// JSON SEGURO
 // ======================================
 
 async function readJson(response) {
+  const text = await response.text();
 
-  const text =
-    await response.text();
-
-  if (!text) {
-    return null;
-  }
+  if (!text) return null;
 
   try {
     return JSON.parse(text);
@@ -106,51 +84,39 @@ async function readJson(response) {
   }
 }
 
-
 // ======================================
 // SUPABASE DATABASE
-// SERVICE ROLE - SOMENTE SERVIDOR
 // ======================================
 
 async function supabaseDatabaseRequest(
   endpoint,
   options = {}
 ) {
-
   checkEnv();
 
-  const response =
-    await fetch(
-      SUPABASE_URL +
-      "/rest/v1/" +
-      endpoint,
-      {
-        ...options,
+  const response = await fetch(
+    SUPABASE_URL + "/rest/v1/" + endpoint,
+    {
+      ...options,
 
-        headers: {
-          apikey:
-            SUPABASE_SERVICE_ROLE_KEY,
+      headers: {
+        apikey: SUPABASE_SERVICE_ROLE_KEY,
 
-          Authorization:
-            "Bearer " +
-            SUPABASE_SERVICE_ROLE_KEY,
+        Authorization:
+          "Bearer " + SUPABASE_SERVICE_ROLE_KEY,
 
-          "Content-Type":
-            "application/json",
+        "Content-Type": "application/json",
 
-          Prefer:
-            "return=representation",
+        Prefer: "return=representation",
 
-          ...(options.headers || {})
-        }
+        ...(options.headers || {})
       }
-    );
+    }
+  );
 
-  const data =
-    await readJson(response);
+  const data = await readJson(response);
 
   if (!response.ok) {
-
     console.error(
       "Erro Supabase DB:",
       response.status,
@@ -167,40 +133,32 @@ async function supabaseDatabaseRequest(
   return data;
 }
 
-
 // ======================================
-// SUPABASE AUTH PÚBLICO
+// SUPABASE AUTH
 // ======================================
 
 async function supabaseAuthRequest(
   endpoint,
   options = {}
 ) {
-
   checkEnv();
 
-  const response =
-    await fetch(
-      SUPABASE_URL +
-      "/auth/v1/" +
-      endpoint,
-      {
-        ...options,
+  const response = await fetch(
+    SUPABASE_URL + "/auth/v1/" + endpoint,
+    {
+      ...options,
 
-        headers: {
-          apikey:
-            SUPABASE_PUBLISHABLE_KEY,
+      headers: {
+        apikey: SUPABASE_PUBLISHABLE_KEY,
 
-          "Content-Type":
-            "application/json",
+        "Content-Type": "application/json",
 
-          ...(options.headers || {})
-        }
+        ...(options.headers || {})
       }
-    );
+    }
+  );
 
-  const data =
-    await readJson(response);
+  const data = await readJson(response);
 
   return {
     response,
@@ -208,15 +166,12 @@ async function supabaseAuthRequest(
   };
 }
 
-
 // ======================================
 // VALIDAR NÚMERO
 // ======================================
 
 function validNumber(value) {
-
-  const number =
-    Number(value);
+  const number = Number(value);
 
   if (
     !Number.isFinite(number) ||
@@ -228,177 +183,108 @@ function validNumber(value) {
   return number;
 }
 
-
 // ======================================
-// TOKEN BEARER
+// BEARER TOKEN
 // ======================================
 
 function getBearerToken(req) {
-
   const authorization =
     req.get("authorization") || "";
 
-  if (
-    !authorization.startsWith(
-      "Bearer "
-    )
-  ) {
+  if (!authorization.startsWith("Bearer ")) {
     return "";
   }
 
-  return authorization
-    .slice(7)
-    .trim();
+  return authorization.slice(7).trim();
 }
-
-
-// ======================================
-// TOKEN ADMIN
-// ======================================
 
 function getAdminToken(req) {
   return getBearerToken(req);
 }
 
-
 // ======================================
-// PROTEGER ROTAS ADMIN
+// PROTEGER ADMIN
 // ======================================
 
-function requireAdmin(
-  req,
-  res,
-  next
-) {
-
-  const token =
-    getAdminToken(req);
-
-  const expiration =
-    adminSessions.get(token);
+function requireAdmin(req, res, next) {
+  const token = getAdminToken(req);
+  const expiration = adminSessions.get(token);
 
   if (
     !token ||
     !expiration ||
     Date.now() > expiration
   ) {
-
     if (token) {
       adminSessions.delete(token);
     }
 
-    return res
-      .status(401)
-      .json({
-        ok: false,
-        error:
-          "Sessão administrativa inválida ou expirada."
-      });
+    return res.status(401).json({
+      ok: false,
+      error:
+        "Sessão administrativa inválida ou expirada."
+    });
   }
 
   next();
 }
 
-
 // ======================================
-// VALIDAR USUÁRIO SUPABASE
+// USUÁRIO SUPABASE
 // ======================================
 
-async function getAuthenticatedUser(
-  accessToken
-) {
+async function getAuthenticatedUser(accessToken) {
+  if (!accessToken) return null;
 
-  if (!accessToken) {
-    return null;
-  }
+  const { response, data } =
+    await supabaseAuthRequest("user", {
+      method: "GET",
 
-  const {
-    response,
-    data
-  } =
-    await supabaseAuthRequest(
-      "user",
-      {
-        method: "GET",
-
-        headers: {
-          Authorization:
-            "Bearer " +
-            accessToken
-        }
+      headers: {
+        Authorization:
+          "Bearer " + accessToken
       }
-    );
+    });
 
-  if (!response.ok) {
-    return null;
-  }
+  if (!response.ok) return null;
 
   return data;
 }
 
-
-// ======================================
-// PROTEGER ROTAS DE USUÁRIO
-// ======================================
-
-async function requireUser(
-  req,
-  res,
-  next
-) {
-
+async function requireUser(req, res, next) {
   try {
-
-    const token =
-      getBearerToken(req);
+    const token = getBearerToken(req);
 
     const user =
-      await getAuthenticatedUser(
-        token
-      );
+      await getAuthenticatedUser(token);
 
     if (!user?.id) {
-
-      return res
-        .status(401)
-        .json({
-          ok: false,
-          error:
-            "Faça login para continuar."
-        });
+      return res.status(401).json({
+        ok: false,
+        error: "Faça login para continuar."
+      });
     }
 
-    req.user =
-      user;
-
-    req.userToken =
-      token;
+    req.user = user;
+    req.userToken = token;
 
     next();
 
   } catch (error) {
-
     console.error(error);
 
-    return res
-      .status(401)
-      .json({
-        ok: false,
-        error:
-          "Sessão inválida."
-      });
+    return res.status(401).json({
+      ok: false,
+      error: "Sessão inválida."
+    });
   }
 }
 
-
 // ======================================
-// BUSCAR PERFIL
+// PERFIL
 // ======================================
 
-async function getProfile(
-  userId
-) {
-
+async function getProfile(userId) {
   const rows =
     await supabaseDatabaseRequest(
       "profiles?id=eq." +
@@ -419,13 +305,11 @@ async function getProfile(
   return rows[0];
 }
 
-
 // ======================================
-// BUSCAR COTAÇÕES
+// COTAÇÕES
 // ======================================
 
 async function getQuote() {
-
   const rows =
     await supabaseDatabaseRequest(
       "quotes?id=eq.main&select=" +
@@ -448,7 +332,6 @@ async function getQuote() {
     !Array.isArray(rows) ||
     rows.length === 0
   ) {
-
     throw new Error(
       "Cotação principal não encontrada."
     );
@@ -457,163 +340,107 @@ async function getQuote() {
   return rows[0];
 }
 
-
 // ======================================
-// COTAÇÃO PÚBLICA TEMPORÁRIA
+// COTAÇÃO PÚBLICA
 // ======================================
-// Mantém o app antigo funcionando
-// enquanto terminamos o login.
 
-app.get(
-  "/api/quotes",
-  async (req, res) => {
+app.get("/api/quotes", async (req, res) => {
+  try {
+    const quote = await getQuote();
 
-    try {
+    res.set("Cache-Control", "no-store");
 
-      const quote =
-        await getQuote();
+    return res.json({
+      ok: true,
 
-      const brlToBob =
-        quote.cliente_brl_to_bob ??
-        quote.brl_to_bob;
+      updatedAt: quote.updated_at,
 
-      const bobToBrl =
-        quote.cliente_bob_to_brl ??
-        quote.bob_to_brl;
+      source:
+        "Cortez & Sarmento Câmbios",
 
-      res.set(
-        "Cache-Control",
-        "no-store"
-      );
+      methodology:
+        "Cotação automática por volume",
 
-      return res.json({
-        ok: true,
+      quote: {
+        brl_to_bob:
+          Number(quote.brl_to_bob),
 
-        updatedAt:
-          quote.updated_at,
+        bob_to_brl:
+          Number(quote.bob_to_brl)
+      }
+    });
 
-        source:
-          "Câmbio Cortez",
+  } catch (error) {
+    console.error(error);
 
-        methodology:
-          "Cotação manual",
-
-        quote: {
-          brl_to_bob:
-            Number(brlToBob),
-
-          bob_to_brl:
-            Number(bobToBrl)
-        }
-      });
-
-    } catch (error) {
-
-      console.error(error);
-
-      return res
-        .status(500)
-        .json({
-          ok: false,
-          error:
-            error.message
-        });
-    }
+    return res.status(500).json({
+      ok: false,
+      error: error.message
+    });
   }
-);
-
+});
 
 // ======================================
-// CADASTRO DO USUÁRIO
+// CADASTRO
 // ======================================
 
 app.post(
   "/api/auth/signup",
   async (req, res) => {
-
     try {
-
       const nome =
-        String(
-          req.body?.nome || ""
-        ).trim();
+        String(req.body?.nome || "").trim();
 
       const email =
-        String(
-          req.body?.email || ""
-        )
+        String(req.body?.email || "")
           .trim()
           .toLowerCase();
 
       const password =
-        String(
-          req.body?.password || ""
-        );
+        String(req.body?.password || "");
 
-      if (
-        nome.length < 2
-      ) {
-        return res
-          .status(400)
-          .json({
-            ok: false,
-            error:
-              "Digite seu nome."
-          });
+      if (nome.length < 2) {
+        return res.status(400).json({
+          ok: false,
+          error: "Digite seu nome."
+        });
       }
 
-      if (
-        !email ||
-        !email.includes("@")
-      ) {
-        return res
-          .status(400)
-          .json({
-            ok: false,
-            error:
-              "Digite um e-mail válido."
-          });
+      if (!email || !email.includes("@")) {
+        return res.status(400).json({
+          ok: false,
+          error: "Digite um e-mail válido."
+        });
       }
 
-      if (
-        password.length < 6
-      ) {
-        return res
-          .status(400)
-          .json({
-            ok: false,
-            error:
-              "A senha deve ter pelo menos 6 caracteres."
-          });
+      if (password.length < 6) {
+        return res.status(400).json({
+          ok: false,
+          error:
+            "A senha deve ter pelo menos 6 caracteres."
+        });
       }
 
-      const {
-        response,
-        data
-      } =
+      const { response, data } =
         await supabaseAuthRequest(
           "signup",
           {
             method: "POST",
 
-            body:
-              JSON.stringify({
-                email,
-                password,
+            body: JSON.stringify({
+              email,
+              password,
 
-                data: {
-                  nome
-                }
-              })
+              data: {
+                nome
+              }
+            })
           }
         );
 
       if (!response.ok) {
-
         return res
-          .status(
-            response.status
-          )
+          .status(response.status)
           .json({
             ok: false,
 
@@ -632,113 +459,81 @@ app.post(
           "Cadastro criado com sucesso.",
 
         accessToken:
-          data?.access_token ||
-          null,
+          data?.access_token || null,
 
         refreshToken:
-          data?.refresh_token ||
-          null,
+          data?.refresh_token || null,
 
         user:
           data?.user || null
       });
 
     } catch (error) {
-
       console.error(error);
 
-      return res
-        .status(500)
-        .json({
-          ok: false,
-          error:
-            "Erro ao criar cadastro."
-        });
+      return res.status(500).json({
+        ok: false,
+        error: "Erro ao criar cadastro."
+      });
     }
   }
 );
 
-
 // ======================================
-// LOGIN DO USUÁRIO
+// LOGIN USUÁRIO
 // ======================================
 
 app.post(
   "/api/auth/login",
   async (req, res) => {
-
     try {
-
       const email =
-        String(
-          req.body?.email || ""
-        )
+        String(req.body?.email || "")
           .trim()
           .toLowerCase();
 
       const password =
-        String(
-          req.body?.password || ""
-        );
+        String(req.body?.password || "");
 
-      if (
-        !email ||
-        !password
-      ) {
-
-        return res
-          .status(400)
-          .json({
-            ok: false,
-            error:
-              "Informe e-mail e senha."
-          });
+      if (!email || !password) {
+        return res.status(400).json({
+          ok: false,
+          error: "Informe e-mail e senha."
+        });
       }
 
-      const {
-        response,
-        data
-      } =
+      const { response, data } =
         await supabaseAuthRequest(
           "token?grant_type=password",
           {
             method: "POST",
 
-            body:
-              JSON.stringify({
-                email,
-                password
-              })
+            body: JSON.stringify({
+              email,
+              password
+            })
           }
         );
 
       if (!response.ok) {
+        return res.status(401).json({
+          ok: false,
 
-        return res
-          .status(401)
-          .json({
-            ok: false,
-
-            error:
-              data?.msg ||
-              data?.message ||
-              data?.error_description ||
-              "E-mail ou senha incorretos."
-          });
+          error:
+            data?.msg ||
+            data?.message ||
+            data?.error_description ||
+            "E-mail ou senha incorretos."
+        });
       }
 
-      const user =
-        data?.user;
+      const user = data?.user;
 
-      let profile =
-        null;
+      let profile = null;
 
       if (user?.id) {
-
         profile =
-          await getProfile(
-            user.id
-          );
+          await getProfile(user.id);
       }
 
       return res.json({
@@ -754,11 +549,8 @@ app.post(
           data.expires_in,
 
         user: {
-          id:
-            user?.id,
-
-          email:
-            user?.email,
+          id: user?.id,
+          email: user?.email,
 
           nome:
             profile?.nome ||
@@ -772,57 +564,42 @@ app.post(
       });
 
     } catch (error) {
-
       console.error(error);
 
-      return res
-        .status(500)
-        .json({
-          ok: false,
-          error:
-            "Erro ao entrar."
-        });
+      return res.status(500).json({
+        ok: false,
+        error: "Erro ao entrar."
+      });
     }
   }
 );
 
-
 // ======================================
-// DADOS DO USUÁRIO LOGADO
+// USUÁRIO LOGADO
 // ======================================
 
 app.get(
   "/api/auth/me",
   requireUser,
   async (req, res) => {
-
     try {
-
       const profile =
-        await getProfile(
-          req.user.id
-        );
+        await getProfile(req.user.id);
 
       return res.json({
         ok: true,
 
         user: {
-          id:
-            req.user.id,
-
-          email:
-            req.user.email,
+          id: req.user.id,
+          email: req.user.email,
 
           nome:
             profile?.nome ||
-            req.user
-              ?.user_metadata
-              ?.nome ||
+            req.user?.user_metadata?.nome ||
             "",
 
           telefone:
-            profile?.telefone ||
-            "",
+            profile?.telefone || "",
 
           tipo:
             profile?.tipo ||
@@ -831,71 +608,79 @@ app.get(
       });
 
     } catch (error) {
-
       console.error(error);
 
-      return res
-        .status(500)
-        .json({
-          ok: false,
-          error:
-            "Não foi possível carregar o perfil."
-        });
+      return res.status(500).json({
+        ok: false,
+        error:
+          "Não foi possível carregar o perfil."
+      });
     }
   }
 );
 
-
 // ======================================
-// COTAÇÃO DO USUÁRIO LOGADO
+// COTAÇÃO DO USUÁRIO
 // ======================================
 
 app.get(
   "/api/user/quotes",
   requireUser,
   async (req, res) => {
-
     try {
-
       const profile =
-        await getProfile(
-          req.user.id
-        );
+        await getProfile(req.user.id);
 
       const tipo =
-        profile?.tipo ||
-        "cliente";
+        profile?.tipo || "cliente";
 
       const quote =
         await getQuote();
 
-      let brlToBob;
-      let bobToBrl;
+      // CLIENTE < R$ 1.000
+      const clienteMenorBrlToBob =
+        Number(quote.brl_to_bob);
 
-      if (
-        tipo === "cambista"
-      ) {
+      const clienteMenorBobToBrl =
+        Number(quote.bob_to_brl);
 
-        brlToBob =
+      // CLIENTE >= R$ 1.000
+      const clienteMaiorBrlToBob =
+        Number(
+          quote.cliente_brl_to_bob ??
+          quote.brl_to_bob
+        );
+
+      const clienteMaiorBobToBrl =
+        Number(
+          quote.cliente_bob_to_brl ??
+          quote.bob_to_brl
+        );
+
+      // CAMBISTA
+      const cambistaBrlToBob =
+        Number(
           quote.cambista_brl_to_bob ??
           quote.cliente_brl_to_bob ??
-          quote.brl_to_bob;
+          quote.brl_to_bob
+        );
 
-        bobToBrl =
+      const cambistaBobToBrl =
+        Number(
           quote.cambista_bob_to_brl ??
           quote.cliente_bob_to_brl ??
-          quote.bob_to_brl;
+          quote.bob_to_brl
+        );
 
-      } else {
+      const brlToBob =
+        tipo === "cambista"
+          ? cambistaBrlToBob
+          : clienteMenorBrlToBob;
 
-        brlToBob =
-          quote.cliente_brl_to_bob ??
-          quote.brl_to_bob;
-
-        bobToBrl =
-          quote.cliente_bob_to_brl ??
-          quote.bob_to_brl;
-      }
+      const bobToBrl =
+        tipo === "cambista"
+          ? cambistaBobToBrl
+          : clienteMenorBobToBrl;
 
       res.set(
         "Cache-Control",
@@ -911,52 +696,59 @@ app.get(
           quote.updated_at,
 
         source:
-          "Câmbio Cortez",
+          "Cortez & Sarmento Câmbios",
 
         methodology:
           tipo === "cambista"
             ? "Taxa especial para cambista"
-            : "Taxa para cliente",
+            : "Cotação automática por volume",
 
         quote: {
-          brl_to_bob:
-            Number(brlToBob),
+          brl_to_bob: brlToBob,
+          bob_to_brl: bobToBrl,
 
-          bob_to_brl:
-            Number(bobToBrl)
+          cliente_menor_brl_to_bob:
+            clienteMenorBrlToBob,
+
+          cliente_menor_bob_to_brl:
+            clienteMenorBobToBrl,
+
+          cliente_maior_brl_to_bob:
+            clienteMaiorBrlToBob,
+
+          cliente_maior_bob_to_brl:
+            clienteMaiorBobToBrl,
+
+          cambista_brl_to_bob:
+            cambistaBrlToBob,
+
+          cambista_bob_to_brl:
+            cambistaBobToBrl
         }
       });
 
     } catch (error) {
-
       console.error(error);
 
-      return res
-        .status(500)
-        .json({
-          ok: false,
-          error:
-            "Não foi possível carregar sua cotação."
-        });
+      return res.status(500).json({
+        ok: false,
+        error:
+          "Não foi possível carregar sua cotação."
+      });
     }
   }
 );
 
-
 // ======================================
-// LOGOUT DO USUÁRIO
+// LOGOUT USUÁRIO
 // ======================================
 
 app.post(
   "/api/auth/logout",
   requireUser,
   async (req, res) => {
-
     try {
-
-      const {
-        response
-      } =
+      const { response } =
         await supabaseAuthRequest(
           "logout",
           {
@@ -971,12 +763,10 @@ app.post(
         );
 
       return res.json({
-        ok:
-          response.ok
+        ok: response.ok
       });
 
     } catch (error) {
-
       console.error(error);
 
       return res.json({
@@ -986,42 +776,31 @@ app.post(
   }
 );
 
-
 // ======================================
-// LOGIN DO ADMINISTRADOR
+// LOGIN ADMIN
 // ======================================
 
 app.post(
   "/api/admin/login",
   (req, res) => {
-
     try {
-
       checkEnv();
 
       const password =
-        String(
-          req.body?.password || ""
-        );
+        String(req.body?.password || "");
 
       const received =
-        Buffer.from(
-          password
-        );
+        Buffer.from(password);
 
       const expected =
-        Buffer.from(
-          ADMIN_PASSWORD
-        );
+        Buffer.from(ADMIN_PASSWORD);
 
-      let correct =
-        false;
+      let correct = false;
 
       if (
         received.length ===
         expected.length
       ) {
-
         correct =
           crypto.timingSafeEqual(
             received,
@@ -1030,14 +809,10 @@ app.post(
       }
 
       if (!correct) {
-
-        return res
-          .status(401)
-          .json({
-            ok: false,
-            error:
-              "Senha incorreta."
-          });
+        return res.status(401).json({
+          ok: false,
+          error: "Senha incorreta."
+        });
       }
 
       const token =
@@ -1057,217 +832,216 @@ app.post(
       });
 
     } catch (error) {
-
       console.error(error);
 
-      return res
-        .status(500)
-        .json({
-          ok: false,
-          error:
-            "Erro no painel administrativo."
-        });
+      return res.status(500).json({
+        ok: false,
+        error:
+          "Erro no painel administrativo."
+      });
     }
   }
 );
 
-
 // ======================================
-// CARREGAR COTAÇÕES NO ADMIN
+// CARREGAR COTAÇÕES ADMIN
 // ======================================
 
 app.get(
   "/api/admin/quotes",
   requireAdmin,
   async (req, res) => {
-
     try {
-
       const quote =
         await getQuote();
 
       return res.json({
         ok: true,
-        data: quote
+
+        data: {
+          // CLIENTE < 1000
+          cliente_menor_brl_to_bob:
+            Number(quote.brl_to_bob),
+
+          cliente_menor_bob_to_brl:
+            Number(quote.bob_to_brl),
+
+          // CLIENTE >= 1000
+          cliente_maior_brl_to_bob:
+            Number(
+              quote.cliente_brl_to_bob ??
+              quote.brl_to_bob
+            ),
+
+          cliente_maior_bob_to_brl:
+            Number(
+              quote.cliente_bob_to_brl ??
+              quote.bob_to_brl
+            ),
+
+          // CAMBISTA
+          cambista_brl_to_bob:
+            Number(
+              quote.cambista_brl_to_bob ??
+              quote.cliente_brl_to_bob ??
+              quote.brl_to_bob
+            ),
+
+          cambista_bob_to_brl:
+            Number(
+              quote.cambista_bob_to_brl ??
+              quote.cliente_bob_to_brl ??
+              quote.bob_to_brl
+            ),
+
+          updated_at:
+            quote.updated_at
+        }
       });
 
     } catch (error) {
-
       console.error(error);
 
-      return res
-        .status(500)
-        .json({
-          ok: false,
-          error:
-            error.message
-        });
+      return res.status(500).json({
+        ok: false,
+        error: error.message
+      });
     }
   }
 );
 
-
 // ======================================
-// SALVAR AS 4 COTAÇÕES
+// SALVAR 6 COTAÇÕES
 // ======================================
 
 app.put(
   "/api/admin/quotes",
   requireAdmin,
   async (req, res) => {
-
-    const clienteBrlToBob =
+    const clienteMenorBrlToBob =
       validNumber(
-        req.body
-          ?.clienteBrlToBob
+        req.body?.clienteMenorBrlToBob
       );
 
-    const clienteBobToBrl =
+    const clienteMenorBobToBrl =
       validNumber(
-        req.body
-          ?.clienteBobToBrl
+        req.body?.clienteMenorBobToBrl
+      );
+
+    const clienteMaiorBrlToBob =
+      validNumber(
+        req.body?.clienteMaiorBrlToBob
+      );
+
+    const clienteMaiorBobToBrl =
+      validNumber(
+        req.body?.clienteMaiorBobToBrl
       );
 
     const cambistaBrlToBob =
       validNumber(
-        req.body
-          ?.cambistaBrlToBob
+        req.body?.cambistaBrlToBob
       );
 
     const cambistaBobToBrl =
       validNumber(
-        req.body
-          ?.cambistaBobToBrl
+        req.body?.cambistaBobToBrl
       );
 
-
     if (
-      clienteBrlToBob === null
+      clienteMenorBrlToBob === null ||
+      clienteMenorBobToBrl === null
     ) {
-
-      return res
-        .status(400)
-        .json({
-          ok: false,
-          error:
-            "Digite uma cotação válida de CLIENTE para REAL → BOLIVIANO."
-        });
+      return res.status(400).json({
+        ok: false,
+        error:
+          "Confira as taxas de cliente abaixo de R$ 1.000."
+      });
     }
 
-
     if (
-      clienteBobToBrl === null
+      clienteMaiorBrlToBob === null ||
+      clienteMaiorBobToBrl === null
     ) {
-
-      return res
-        .status(400)
-        .json({
-          ok: false,
-          error:
-            "Digite uma cotação válida de CLIENTE para BOLIVIANO → REAL."
-        });
+      return res.status(400).json({
+        ok: false,
+        error:
+          "Confira as taxas de cliente a partir de R$ 1.000."
+      });
     }
 
-
     if (
-      cambistaBrlToBob === null
-    ) {
-
-      return res
-        .status(400)
-        .json({
-          ok: false,
-          error:
-            "Digite uma cotação válida de CAMBISTA para REAL → BOLIVIANO."
-        });
-    }
-
-
-    if (
+      cambistaBrlToBob === null ||
       cambistaBobToBrl === null
     ) {
-
-      return res
-        .status(400)
-        .json({
-          ok: false,
-          error:
-            "Digite uma cotação válida de CAMBISTA para BOLIVIANO → REAL."
-        });
+      return res.status(400).json({
+        ok: false,
+        error:
+          "Confira as taxas de cambista."
+      });
     }
 
-
     try {
-
       const rows =
         await supabaseDatabaseRequest(
           "quotes?id=eq.main",
           {
             method: "PATCH",
 
-            body:
-              JSON.stringify({
+            body: JSON.stringify({
+              // CLIENTE < 1000
+              brl_to_bob:
+                clienteMenorBrlToBob,
 
-                cliente_brl_to_bob:
-                  clienteBrlToBob,
+              bob_to_brl:
+                clienteMenorBobToBrl,
 
-                cliente_bob_to_brl:
-                  clienteBobToBrl,
+              // CLIENTE >= 1000
+              cliente_brl_to_bob:
+                clienteMaiorBrlToBob,
 
-                cambista_brl_to_bob:
-                  cambistaBrlToBob,
+              cliente_bob_to_brl:
+                clienteMaiorBobToBrl,
 
-                cambista_bob_to_brl:
-                  cambistaBobToBrl,
+              // CAMBISTA
+              cambista_brl_to_bob:
+                cambistaBrlToBob,
 
-                // COMPATIBILIDADE
-                brl_to_bob:
-                  clienteBrlToBob,
+              cambista_bob_to_brl:
+                cambistaBobToBrl,
 
-                bob_to_brl:
-                  clienteBobToBrl,
-
-                updated_at:
-                  new Date()
-                    .toISOString()
-              })
+              updated_at:
+                new Date().toISOString()
+            })
           }
         );
 
       return res.json({
         ok: true,
-        data:
-          rows?.[0] ||
-          null
+        data: rows?.[0] || null
       });
 
     } catch (error) {
-
       console.error(error);
 
-      return res
-        .status(500)
-        .json({
-          ok: false,
-          error:
-            "Não foi possível salvar as cotações."
-        });
+      return res.status(500).json({
+        ok: false,
+        error:
+          "Não foi possível salvar as cotações."
+      });
     }
   }
 );
 
-
 // ======================================
-// LISTAR USUÁRIOS NO ADM
+// LISTAR USUÁRIOS
 // ======================================
 
 app.get(
   "/api/admin/users",
   requireAdmin,
   async (req, res) => {
-
     try {
-
       const profiles =
         await supabaseDatabaseRequest(
           "profiles?select=id,nome,telefone,tipo,created_at&order=created_at.desc",
@@ -1278,102 +1052,79 @@ app.get(
 
       return res.json({
         ok: true,
-        users:
-          profiles || []
+        users: profiles || []
       });
 
     } catch (error) {
-
       console.error(error);
 
-      return res
-        .status(500)
-        .json({
-          ok: false,
-          error:
-            "Não foi possível carregar os usuários."
-        });
+      return res.status(500).json({
+        ok: false,
+        error:
+          "Não foi possível carregar os usuários."
+      });
     }
   }
 );
 
-
 // ======================================
-// TRANSFORMAR CLIENTE / CAMBISTA
+// ALTERAR CLIENTE / CAMBISTA
 // ======================================
 
 app.put(
   "/api/admin/users/:id/type",
   requireAdmin,
   async (req, res) => {
-
     try {
-
       const userId =
-        String(
-          req.params.id || ""
-        );
+        String(req.params.id || "");
 
       const tipo =
-        String(
-          req.body?.tipo || ""
-        );
+        String(req.body?.tipo || "");
 
       if (
         tipo !== "cliente" &&
         tipo !== "cambista"
       ) {
-
-        return res
-          .status(400)
-          .json({
-            ok: false,
-            error:
-              "Tipo de usuário inválido."
-          });
+        return res.status(400).json({
+          ok: false,
+          error:
+            "Tipo de usuário inválido."
+        });
       }
 
       const rows =
         await supabaseDatabaseRequest(
           "profiles?id=eq." +
-          encodeURIComponent(
-            userId
-          ),
+          encodeURIComponent(userId),
           {
             method: "PATCH",
 
-            body:
-              JSON.stringify({
-                tipo,
-                updated_at:
-                  new Date()
-                    .toISOString()
-              })
+            body: JSON.stringify({
+              tipo,
+
+              updated_at:
+                new Date().toISOString()
+            })
           }
         );
 
       return res.json({
         ok: true,
-        data:
-          rows?.[0] ||
-          null
+        data: rows?.[0] || null
       });
 
     } catch (error) {
-
       console.error(error);
 
-      return res
-        .status(500)
-        .json({
-          ok: false,
-          error:
-            "Não foi possível alterar o tipo do usuário."
-        });
+      return res.status(500).json({
+        ok: false,
+        error:
+          "Não foi possível alterar o tipo do usuário."
+      });
     }
   }
 );
-
 
 // ======================================
 // LOGOUT ADMIN
@@ -1383,7 +1134,6 @@ app.post(
   "/api/admin/logout",
   requireAdmin,
   (req, res) => {
-
     adminSessions.delete(
       getAdminToken(req)
     );
@@ -1394,7 +1144,6 @@ app.post(
   }
 );
 
-
 // ======================================
 // PÁGINA ADMIN
 // ======================================
@@ -1402,7 +1151,6 @@ app.post(
 app.get(
   "/admin",
   (req, res) => {
-
     res.sendFile(
       path.join(
         __dirname,
@@ -1412,35 +1160,31 @@ app.get(
   }
 );
 
-
 // ======================================
-// TESTE
+// HEALTH CHECK
 // ======================================
 
 app.get(
   "/api/health",
   (req, res) => {
-
     res.json({
       ok: true,
       service:
-        "Câmbio Cortez"
+        "Cortez & Sarmento Câmbios"
     });
   }
 );
 
-
 // ======================================
-// INICIAR SERVIDOR
+// INICIAR
 // ======================================
 
 app.listen(
   PORT,
   "0.0.0.0",
   () => {
-
     console.log(
-      "Câmbio Cortez iniciado na porta " +
+      "Cortez & Sarmento Câmbios iniciado na porta " +
       PORT
     );
   }
