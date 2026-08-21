@@ -9,22 +9,19 @@
     content="width=device-width, initial-scale=1, viewport-fit=cover"
   >
 
-  <meta
-    name="theme-color"
-    content="#080808"
-  >
+  <meta name="theme-color" content="#080808">
 
   <meta
     name="description"
-    content="Câmbio Cortez — cotação direta entre Real e Boliviano."
+    content="Cortez & Sarmento Câmbios — cotação direta entre Real e Boliviano."
   >
 
-  <title>Câmbio Cortez</title>
+  <title>Cortez & Sarmento Câmbios</title>
 
   <!-- PRÉVIA DO LINK NO WHATSAPP / REDES -->
   <meta
     property="og:title"
-    content="Câmbio Cortez"
+    content="Cortez & Sarmento Câmbios"
   >
 
   <meta
@@ -32,10 +29,7 @@
     content="Cotação direta e confiável entre Real e Boliviano."
   >
 
-  <meta
-    property="og:type"
-    content="website"
-  >
+  <meta property="og:type" content="website">
 
   <meta
     property="og:url"
@@ -49,7 +43,7 @@
 
   <meta
     property="og:image:alt"
-    content="Câmbio Cortez"
+    content="Cortez & Sarmento Câmbios"
   >
 
   <meta
@@ -57,19 +51,13 @@
     content="summary_large_image"
   >
 
-  <link
-    rel="stylesheet"
-    href="/styles.css"
-  >
+  <link rel="stylesheet" href="/styles.css">
 </head>
-
 
 <body>
 
-  <section
-    id="accessScreen"
-    class="access-screen"
-  >
+  <!-- LOGIN / CADASTRO -->
+  <section id="accessScreen" class="access-screen">
 
     <div class="access-card">
 
@@ -82,8 +70,8 @@
       </p>
 
       <h1>
-        CÂMBIO
-        <span>CORTEZ</span>
+        CORTEZ & SARMENTO
+        <span>CÂMBIOS</span>
       </h1>
 
       <p class="intro">
@@ -144,10 +132,8 @@
   </section>
 
 
-  <main
-    id="app"
-    class="app hidden"
-  >
+  <!-- APLICAÇÃO -->
+  <main id="app" class="app hidden">
 
     <header class="topbar">
 
@@ -158,16 +144,13 @@
         </div>
 
         <div>
-          <strong>Câmbio Cortez</strong>
+          <strong>Cortez & Sarmento Câmbios</strong>
           <span>Mercado P2P</span>
         </div>
 
       </div>
 
-      <div
-        id="status"
-        class="status loading"
-      >
+      <div id="status" class="status loading">
         ● Conectando
       </div>
 
@@ -197,6 +180,23 @@
     </section>
 
 
+    <!-- AVISO DE COTAÇÃO POR VOLUME -->
+    <section class="volume-info">
+      <p class="eyebrow">
+        COTAÇÃO POR VOLUME
+      </p>
+
+      <strong>
+        💰 Quanto maior o valor, melhor sua cotação
+      </strong>
+
+      <small>
+        Operações a partir de R$ 1.000 recebem uma condição especial.
+      </small>
+    </section>
+
+
+    <!-- COTAÇÕES -->
     <section class="cards">
 
       <article class="quote-card cross-card">
@@ -213,7 +213,7 @@
             </strong>
 
             <small>
-              Cotação direta definida por você
+              Sua cotação é aplicada automaticamente
             </small>
           </div>
 
@@ -262,6 +262,7 @@
     </section>
 
 
+    <!-- CALCULADORA -->
     <section class="converter">
 
       <p class="eyebrow">
@@ -317,6 +318,12 @@
       </select>
 
 
+      <!-- MENSAGEM PARA INCENTIVAR VALORES MAIORES -->
+      <div id="volumeMessage" class="volume-message">
+        💰 Quanto maior o valor, melhor sua cotação.
+      </div>
+
+
       <div class="result-box">
 
         <small>
@@ -330,6 +337,11 @@
         <span id="conversionRate">
           Aguardando cotação
         </span>
+
+        <div
+          id="volumeBenefit"
+          class="volume-benefit"
+        ></div>
 
         <div class="result-validity">
           ⏱ Cotação válida por 10 minutos
@@ -372,7 +384,7 @@
       </div>
 
       <div id="methodology">
-        Cotação manual · Câmbio Cortez
+        Cotação manual · Cortez & Sarmento Câmbios
       </div>
 
     </footer>
